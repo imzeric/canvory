@@ -1,2 +1,2 @@
 # canvory
-where Ideas Take Shape
+Where Ideas Take Shape
