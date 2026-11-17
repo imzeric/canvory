@@ -131,4 +131,4 @@ CDM → 可交付演示文稿文件。
 
 ## 9. 待审设计（未实施）
 
-网页 AI PPT 工作室的设计规格在 `docs/superpowers/specs/2026-11-17-web-ppt-studio-design.md`。产品事实在根目录 `PRODUCT.md`，视觉种子在 `DESIGN.md`。这三份只供审核，不是第一阶段已交付范围，也没有实施计划。
+当前方案是 Penpot 画布上的 AI 助手，规格在 `docs/superpowers/specs/2026-11-18-penpot-ai-ppt-design.md`。产品事实在 `PRODUCT.md`，浮窗视觉种子在 `DESIGN.md`。2026-11-17 的独立网页向导已不是当前方案。三份文档只供审核，没有实施计划。

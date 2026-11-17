@@ -1,145 +1,128 @@
 ---
-name: Canvory Web PPT Studio
-description: 浅色工作台提案。画布是桌上最亮的一张纸，周围界面退后。尚未实现，不是从已上线界面提取的。
+name: Canvory on Penpot
+description: 助手浮窗的视觉种子。画布仍是 Penpot 的画布。尚未实现，不是从已上线界面提取的。
 colors:
-  desk: "#d5dbe3"
-  chrome: "#eef1f5"
-  panel: "#f6f8fa"
-  sheet: "#ffffff"
-  ink: "#1a2332"
-  ink-muted: "#5c6778"
-  line: "#d5dbe3"
-  select: "#1d4e89"
-  select-wash: "#e7eef6"
-  danger: "#8f2d2d"
-  warning: "#8a5a12"
+  panel: "#181b1f"
+  panel-raised: "#22272d"
+  ink: "#e7ecec"
+  ink-muted: "#9aa6ad"
+  line: "#343b42"
+  action: "#11b3a2"
+  action-ink: "#06211e"
+  mount: "#16332f"
+  danger: "#e07a72"
+  warning: "#e0b15a"
 typography:
   ui:
     fontFamily: "\"Source Han Sans SC\", \"Noto Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif"
-    fontSize: "15px"
+    fontSize: "14px"
     fontWeight: 400
-    lineHeight: 1.65
+    lineHeight: 1.55
     letterSpacing: "0"
   ui-strong:
     fontFamily: "\"Source Han Sans SC\", \"Noto Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif"
-    fontSize: "15px"
+    fontSize: "14px"
     fontWeight: 650
-    lineHeight: 1.4
+    lineHeight: 1.35
     letterSpacing: "0"
-  step-index:
+  caption:
     fontFamily: "\"Source Han Sans SC\", \"Noto Sans SC\", \"PingFang SC\", sans-serif"
-    fontSize: "13px"
-    fontWeight: 650
-    lineHeight: 1.2
-    letterSpacing: "0.04em"
-  slide-fallback:
-    fontFamily: "\"Source Han Sans SC\", \"Noto Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif"
-    fontSize: "18px"
+    fontSize: "12px"
     fontWeight: 400
-    lineHeight: 1.45
+    lineHeight: 1.4
     letterSpacing: "0"
 rounded:
   sm: "2px"
-  md: "6px"
+  md: "8px"
 spacing:
   xs: "4px"
   sm: "8px"
-  md: "16px"
-  lg: "32px"
-  desk: "48px"
+  md: "12px"
+  lg: "20px"
 components:
   button-primary:
-    backgroundColor: "{colors.select}"
-    textColor: "{colors.sheet}"
-    rounded: "{rounded.sm}"
-    padding: "8px 16px"
-  button-primary-hover:
-    backgroundColor: "#163a68"
-    textColor: "{colors.sheet}"
-    rounded: "{rounded.sm}"
-    padding: "8px 16px"
-  button-quiet:
-    backgroundColor: "{colors.panel}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.action-ink}"
     rounded: "{rounded.sm}"
     padding: "8px 12px"
+  button-quiet:
+    backgroundColor: "{colors.panel-raised}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sm}"
+    padding: "6px 10px"
+  mount-chip:
+    backgroundColor: "{colors.mount}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sm}"
+    padding: "4px 8px"
   panel:
     backgroundColor: "{colors.panel}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
-    padding: "16px"
-  sheet:
-    backgroundColor: "{colors.sheet}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.sm}"
-    padding: "0"
+    padding: "12px"
 ---
 
 ## Overview
 
-这是实现前的视觉种子，供审核。仓库里没有网页主应用，本文件不是从已上线界面扫描出来的。
+这是实现前的浮窗种子，供审核。2026-11-17 那版浅色独立工作台不再是当前方案。
 
-使用场景是白天的书桌：人坐在窗边改一份要讲的稿。幻灯片是桌上最亮的一张白纸，四周是凉灰色的桌面。界面用这张纸的边缘、对齐和留白来分层，不用大面积色块抢画布。
+Penpot 2.4.3 的插件 UI 是 `plugin-modal`：绝对定位、可调大小、叠在画布上，不是停靠侧栏（`frontend/resources/plugins-runtime/index.js` 的 `plugin-modal`）。画布的层级、标尺和工具栏保持 Penpot 原样。助手只占一块有边界的浮窗，让画布仍是主表面。
 
-主色只用于选中和主按钮。数据图表的序列色写在图表数据上，不拿来装饰工具栏。
+浮窗跟随 `themechange`。下面的色值是深色主题下的回退，不是第二套品牌。选中色取自这套深色界面里已经出现的青绿，避免再引入另一套蓝。
 
 ## Colors
 
 | 令牌 | 色值 | 用途 |
 |---|---|---|
-| desk | `#d5dbe3` | 画布后面的桌面 |
-| chrome | `#eef1f5` | 顶栏和步骤轨 |
-| panel | `#f6f8fa` | 缩略图列和右侧面板 |
-| sheet | `#ffffff` | 幻灯片纸 |
-| ink | `#1a2332` | 正文 |
-| ink-muted | `#5c6778` | 次要说明 |
-| line | `#d5dbe3` | 分隔和纸的边缘 |
-| select | `#1d4e89` | 选中框和主按钮 |
-| select-wash | `#e7eef6` | 选中行的底 |
-| danger | `#8f2d2d` | 阻断错误 |
-| warning | `#8a5a12` | 可继续的警告 |
+| panel | `#181b1f` | 浮窗底 |
+| panel-raised | `#22272d` | 输入区和次按钮 |
+| ink | `#e7ecec` | 浮窗正文 |
+| ink-muted | `#9aa6ad` | 状态和来源 |
+| line | `#343b42` | 分隔 |
+| action | `#11b3a2` | 唯一主操作 |
+| action-ink | `#06211e` | 主操作上的字 |
+| mount | `#16332f` | 已挂载画板的标签 |
+| danger | `#e07a72` | 阻断 |
+| warning | `#e0b15a` | 可继续的警告 |
 
-幻灯片纸与桌面的亮度差是层级的主要手段。面板比桌面略亮，仍暗于纸。不要把面板做成纯白，否则纸不再突出。
-
-序列色（只用于图表数据，网页和 PPTX 使用同一组）：`#1d4e89`、`#b45309`、`#0f6b5c`、`#7a3048`、`#3f4c6b`、`#6b5b2a`。不靠颜色单独区分，旁边有序列名。
-
-对比度没有仪器测量。ink 对 sheet、sheet 对 select 的组合在实现时要测，这里不写已达标。
+画布上的画板填充仍由模板背景决定，不用浮窗色去涂画板。图表序列色沿用数据表里的六色，不拿来装饰浮窗。
 
 ## Typography
 
-界面用思源黑体 / Noto Sans SC，回退到苹方和微软雅黑。中文不加大字距。大纲和属性面板行高 1.65，便于长段。步骤序号用同一字体的 650 字重，不另找展示体。
+浮窗字号对齐插件运行时的 `--font-size-m: 14px`。中文用思源黑体，回退苹方和微软雅黑，不加字距。需求输入行高 1.55，随内容变高，不设字数上限。章节行用 12px 说明状态，不和正文抢。
 
-幻灯片上的字优先用模板点名的字体。模板字体缺失时，界面用 slide-fallback，并在预检里写明替换，不静默嵌入未授权字体。
-
-数字和图表表用同一套中文黑体的等宽数字特性（`tabular-nums`），不引入第二套拉丁展示字体。
+画板上的字用模板字体。缺失时回退到同一套黑体，并在预检里写明。
 
 ## Layout
 
-向导：左侧 200px 步骤轨，中间阅读宽度 720px。大纲编辑器在这 720px 里撑满，随内容变高，不出现「已达上限」。
+浮窗内部从上到下，只有一条阅读顺序：
 
-编辑器：左 220px 缩略图，右 320px 属性，中间剩余全部给桌面。纸的四周至少 48px 桌面。窗口变窄时先收起右侧为抽屉，缩略图改成顶上一行，纸保持可见。不把三列挤到字重叠。
+1. 模式。PPT 是当前唯一会画板的模式，用分段控制标明，不做成向导步骤。
+2. 挂载。横排名称标签，可移除。标签不是缩略画布。
+3. 需求与资料。浮窗里最大的文本区。
+4. 章节。一行一节，右侧是状态。
+5. 主按钮。绘制，或在已挂载时改为「应用到挂载」。停止是次按钮。
+6. 仅当挂载对象是图表时，才展开数据表。
 
-中文长大纲在编辑器里连续滚动。步骤轨只标「大纲 / 编辑 / 属性 / 生成」，不把每一块大纲做成一屏卡片堆。
+浮窗默认不盖住整块画布。Penpot 运行时把宽高限制在窗口内（最小约 200，默认约 335×590）。窄窗口时浮窗内部改为上下滚动，不把挂载标签折成无法点的图标。
 
 ## Elevation & Depth
 
-纸用 1px `line` 边和一层短阴影（`0 8px 24px rgb(26 35 50 / 12%)`）。阴影只属于纸和打开的菜单。面板不浮起来。选中框是 2px `select`，不靠发光。
-
-动效：面板和选中 160ms，缓出。生成进度用步骤文字和已完成块数，不用循环闪烁。系统要求减少动效时，切换立即完成。
+浮窗沿用宿主已有的描边和阴影，不另加发光。挂载标签没有阴影。主按钮不跳动。进度是章节行上的文字「第 i / n」，减少动效时立即切换。
 
 ## Shapes
 
-圆角停在 2px 和 6px。按钮 2px，面板 6px，幻灯片纸 2px。不做胶囊按钮，也不做大圆角卡片把纸和面板混成一类。
+浮窗外角 8px，与宿主 `plugin-modal` 的圆角同级。内部按钮和标签 2px，避免变成胶囊后和 Penpot 的工具条混淆。
 
 ## Components
 
-主按钮只有一个：当前步骤的「继续」或编辑器里的「导出」。其余是 quiet 按钮。破坏性动作（丢弃下游生成结果）用 danger 文字，不做成实心大红按钮，除非操作不可恢复。
+主按钮同时只存在一个。关闭浮窗是宿主标题栏上的关闭，不在内容区再做一个主按钮。
 
-缩略图是按比例缩小的纸，下面一行页名。选中态用 select-wash 和左侧 2px 条。拖动时原位留线，不把缩略图放大成第二块画布。
+挂载标签显示画板名和移除。锁定是标签上的单独动作，锁定后该画板不接受生成写入。
 
-图表在纸上按数据绘制，纸外的属性面板永远有同一张数据表。表是编辑入口，图是结果。
+错误写在需求区或对应章节行下，不使用全屏对话框挡住画布。
 
 ## Do's and Don'ts
 
-- 做：让纸比周围更亮；长文用同一套黑体；错误写在发生它的字段旁。
-- 不做：暖米色底配衬线标题；把主色铺满顶栏；用截图冒充图表；在中文段落上加宽字距；用动画掩盖未完成的块。
+- 做：让 Penpot 画布保持可见；挂载名单和当前选区同时可见且样式不同；长中文在浮窗内滚动。
+- 不做：把浮窗画成独立站点的三栏工作台；用步骤轨强迫六步；用暖色纸面盖住 Penpot；把图表预览画得比数据表更像可以改数的地方。
