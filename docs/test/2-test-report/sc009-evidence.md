@@ -1,15 +1,15 @@
 # SC-009 发布门禁证据索引
 
 **日期**: 2026-11-17  
-**结论**: 技术骨架已齐；跨软件实测与 Penpot UI 实机仍为发布前必补项。
+**结论**: 发布门禁仍不成立。版本恢复与 BullMQ/MinIO 已有本次远程实机记录；跨软件与 Penpot 三页下载未完成。SC-008 试用未完成。SC-003 为 SKIP，不能当成兼容通过。
 
 | SC-009 要求 | 证据 | 状态 |
 |-------------|------|------|
 | 完整元素映射 | `packages/adapters/penpot`、`packages/exporters/pptx`；fixtures G-TEXT/SHAPE/IMG/GROUP/NOTES | 实现 ✓ |
 | 预检报告 | `packages/core` preflight；`PreflightPanel`；V3 自动验收 | 实现 ✓ |
-| 跨软件兼容 | `compat-matrix.md` + `pptx-structure-smoke.md` | 结构冒烟 ✓；WPS 已拉起待人工确认；PP/Keynote/LibreOffice BLOCKED-ENV |
-| 文档版本恢复 | `versions.integration.test.ts`；export-api restore MUST 拷贝 | 实现 ✓ |
-| 后台导出任务 | `TasksService` + `queue.ts`（BullMQ 可选）+ 内联回退；tasks.integration.test | 实现 ✓ |
+| 跨软件兼容 | `compat-matrix.md` + `pptx-structure-smoke.md` | ZIP 冒烟 ✓；本次远程四款软件均为 BLOCKED-ENV。不是 SC-005 |
+| 文档版本恢复 | `rm03-infra.md`（新进程读到 v1/v2/v3） | 实机 ✓ |
+| 后台导出任务 | `rm03-infra.md`（BullMQ 成功可下、取消 404、MinIO 对象） | 实机 ✓ |
 
 ## 相关成功标准交叉引用
 

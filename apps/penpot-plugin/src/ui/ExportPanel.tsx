@@ -10,7 +10,7 @@ import {
   createBackgroundTask,
   pollTask,
 } from "../api.js";
-import { isPenpotHost, rasterizeShapeById } from "../penpot-host.js";
+import { rasterizeFromHost } from "./host-client.js";
 
 export interface BoardOption {
   id: string;
@@ -59,13 +59,12 @@ function downloadReport(report: ExportReport) {
   URL.revokeObjectURL(url);
 }
 
-const hostRasterize: RasterizeFn = async (req) => {
-  if (!isPenpotHost()) return null;
-  return rasterizeShapeById(req.nodeId, {
+const hostRasterize: RasterizeFn = async (req) =>
+  rasterizeFromHost({
+    nodeId: req.nodeId,
     widthPx: req.widthPx,
     heightPx: req.heightPx,
   });
-};
 
 export function ExportPanel({
   boards,

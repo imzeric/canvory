@@ -87,15 +87,15 @@
 
 > **结论（2026-11-17）**：001 **实现与自动验收基本齐**；按 SC-009 / 本文件实机清单，**第一阶段发布包尚未全部完成**。  
 > **台账**：开放项维护在 `docs/shipping/0-to-dos.md`（及 `1-doing.md`）；证据在 `docs/test/`。  
-> **规格任务**：`specs/001-pptx-phase1/tasks.md` 仅余 **T087**（= RM-02 证据）未勾。
+> **规格任务**：`specs/001-pptx-phase1/tasks.md` 仅余 **T087**（= RM-02 证据）未勾。本次远程复核后仍不勾。
 
-### A. 发布阻塞（SC-009 必达 · 未完成）
+### A. 发布项（SC-009）
 
 | ID | 项 | 当前状态 | 缺口 | 证据 / 台账 |
 |----|----|----------|------|-------------|
-| RM-01 | Penpot 装插件跑 V1 | **未完成** | 自托管 Penpot + plugins runtime + 插件安装 + 三页浏览器导出可开 PPTX 未实机验收；quickstart **V1 = SKIP** | `0-to-dos` RM-01；`1-doing` RTG-03；`quickstart-v1-v9.md` |
-| RM-02 | 办公软件填 SC-005 | **未达标** | PP / Keynote / LibreOffice = `BLOCKED-ENV`；WPS 已拉起产物，**「无修复提示」待人工目视**；矩阵未清零；**T087** 未勾 | `compat-matrix.md`；`0-to-dos` RM-02；tasks T087 |
-| RM-03 | Postgres / Redis / MinIO 联调 | **未完成** | 代码路径已有；缺 `USE_MEMORY_DB≠1` 实机联调记录（跨进程版本、BullMQ succeeded 下载、`storageKey` 取字节） | `0-to-dos` RM-03；尚无 `2-test-report` 联调报告 |
+| RM-01 | Penpot 装插件跑 V1 | **未完成** | 2026-11-17 远程：Penpot 2.4.3 可打开，`enable-feature-plugins` 已写入 config.js。浏览器会话未完成三页下载，无 PPTX 产物。quickstart **V1 = SKIP** | `remote-acceptance-7484.md`；`1-doing` RTG-03 |
+| RM-02 | 办公软件填 SC-005 | **未达标** | 本次远程 PowerPoint / WPS / Keynote / LibreOffice 均为 `BLOCKED-ENV`。ZIP 冒烟不是打开结果。**T087** 未勾 | `compat-matrix.md`；tasks T087 |
+| RM-03 | Postgres / Redis / MinIO 联调 | **已完成（本次远程）** | `USE_MEMORY_DB=0`、`EXPORT_INLINE=0`：401、跨进程版本恢复、BullMQ 成功下载、取消 404、storageKey 图片进入 PPTX | `rm03-infra.md` |
 
 **SC-009 交叉状态**
 
@@ -103,8 +103,8 @@
 |------|------|
 | 完整元素映射 + 预检报告 | 实现 ✓（自动验收 / fixtures） |
 | 跨软件兼容达标（SC-005） | **未达标** ← RM-02 |
-| 文档版本恢复 | 实现 ✓（集成测）；**跨进程实机** ← 依赖 RM-03 |
-| 后台导出任务 | 实现 ✓（集成测 / 内联）；**BullMQ+MinIO 实机** ← 依赖 RM-03 |
+| 文档版本恢复 | 跨进程实机 ✓（`rm03-infra.md`） |
+| 后台导出任务 | BullMQ + MinIO 实机 ✓（`rm03-infra.md`） |
 | 演示闭环（Penpot UI） | **未完成** ← RM-01 |
 
 任一发布阻塞项未闭环 → **第一阶段不算发布完成**（与 `0-draft` MVP-3/MVP-4 同包约定一致）。
@@ -115,9 +115,9 @@
 |-----------|------|------|------|
 | SC-001 文本可编辑率 | ≥95% | 黄金样例自动比率 PASS（见 `sc001-sc002-rates.md`） | 达标（样例集） |
 | SC-002 基础图形原生率 | ≥90% | 同上 PASS | 达标（样例集） |
-| SC-003 位置误差 ≤0.5% 页宽 | LibreOffice 无头测锚点 | **SKIP**（无 soffice） | 未测 |
+| SC-003 位置误差 ≤0.5% 页宽 | LibreOffice 无头测锚点 | **SKIP**（本次未安装 soffice；不能当成兼容通过） | 未测 |
 | SC-004 ≤20 页 / 30s | 墙钟可测 | 单页 CLI PASS；大页数实机未记 | 部分 |
-| SC-005 四软件无修复提示 | 100% | 矩阵未清零 | **未达标** |
+| SC-005 四软件无修复提示 | 100% | 本次远程四款 BLOCKED-ENV | **未达标** |
 | SC-006 L2/L3 全入报告 | 100% | V3 自动 PASS | 达标（自动） |
 | SC-007 手工 CDM + 最小 HTML | 架构护栏 | V8 PASS | 达标 |
 | SC-008 可用性 ≥5 人 / ≥90% | 试用协议 | **试用未完成**（样本不足） | 未完成；不单独否决 SC-009，发布说明 MUST 标注 |

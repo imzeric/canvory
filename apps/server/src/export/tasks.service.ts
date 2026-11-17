@@ -15,6 +15,7 @@ import { DocumentsService } from "../documents/documents.service.js";
 import { enqueuePptxJob, queueEnabled } from "./queue.js";
 import { getObject, storeExportArtifact } from "../storage/minio.js";
 import { loadTaskStatus, saveTaskStatus } from "./task-status-store.js";
+import { mergeExportTask } from "./task-merge.js";
 import { upsertExportJob } from "../db/postgres-documents.js";
 
 type TaskStatus =
@@ -45,6 +46,23 @@ export type ExportTask = {
 function isCancelled(taskId: string): boolean {
   const t = memory.jobs.get(taskId) as unknown as ExportTask | undefined;
   return t?.status === "cancelled";
+}
+
+async function persistJobRow(task: ExportTask): Promise<void> {
+  // artifact_asset_id 外键指向 assets。BullMQ 路径的字节在 MinIO `exports/{taskId}.pptx`，
+  // 不把尚未登记的 UUID 写入该列，避免任务状态更新被外键拒绝。
+  await upsertExportJob({
+    id: task.id,
+    documentId: task.documentId,
+    versionId: task.versionId,
+    format: "pptx",
+    mode: task.mode,
+    status: task.status,
+    progress: task.progress,
+    artifactAssetId: null,
+    errorMessage: task.errorMessage,
+    createdBy: task.createdBy,
+  });
 }
 
 @Injectable()
@@ -86,16 +104,7 @@ export class TasksService {
     };
     memory.jobs.set(taskId, task as unknown as Record<string, unknown>);
     await saveTaskStatus(task);
-    void upsertExportJob({
-      id: taskId,
-      documentId: input.documentId,
-      versionId,
-      format: "pptx",
-      mode: input.mode,
-      status: "queued",
-      progress: 0,
-      createdBy: user.id,
-    });
+    await persistJobRow(task);
 
     const enqueued = await enqueuePptxJob({
       taskId,
@@ -173,17 +182,7 @@ export class TasksService {
       latest.finishedAt = new Date().toISOString();
       latest.updatedAt = latest.finishedAt;
       await saveTaskStatus(latest);
-      void upsertExportJob({
-        id: taskId,
-        documentId: latest.documentId,
-        versionId: latest.versionId,
-        format: "pptx",
-        mode: latest.mode,
-        status: "succeeded",
-        progress: 100,
-        artifactAssetId: assetId,
-        createdBy: latest.createdBy,
-      });
+      await persistJobRow(latest);
     } catch (e) {
       if (isCancelled(taskId)) return;
       const latest = memory.jobs.get(taskId) as unknown as ExportTask | undefined;
@@ -194,33 +193,29 @@ export class TasksService {
       latest.finishedAt = new Date().toISOString();
       latest.updatedAt = latest.finishedAt;
       await saveTaskStatus(latest);
-      void upsertExportJob({
-        id: taskId,
-        documentId: latest.documentId,
-        versionId: latest.versionId,
-        format: "pptx",
-        mode: latest.mode,
-        status: "failed",
-        progress: latest.progress,
-        errorMessage: latest.errorMessage,
-        createdBy: latest.createdBy,
-      });
+      await persistJobRow(latest);
     }
   }
 
-  async get(taskId: string, user: AuthUser) {
-    let task = memory.jobs.get(taskId) as unknown as ExportTask | undefined;
-    if (!task) {
-      const remote = await loadTaskStatus(taskId);
-      if (remote) {
-        memory.jobs.set(taskId, remote as unknown as Record<string, unknown>);
-        task = remote;
-      }
+  private async hydrate(taskId: string): Promise<ExportTask | undefined> {
+    const local = memory.jobs.get(taskId) as unknown as ExportTask | undefined;
+    const remote = await loadTaskStatus(taskId);
+    const merged = mergeExportTask(local, remote);
+    if (merged) {
+      memory.jobs.set(taskId, merged as unknown as Record<string, unknown>);
     }
+    return merged;
+  }
+
+  async get(taskId: string, user: AuthUser) {
+    const task = await this.hydrate(taskId);
     if (!task || task.createdBy !== user.id) {
       throw new NotFoundException({
         error: { code: "NOT_FOUND", message: "任务不存在" },
       });
+    }
+    if (task.status === "succeeded" || task.status === "failed" || task.status === "cancelled") {
+      await persistJobRow(task);
     }
     return {
       taskId: task.id,
@@ -236,14 +231,7 @@ export class TasksService {
   }
 
   async cancel(taskId: string, user: AuthUser) {
-    let task = memory.jobs.get(taskId) as unknown as ExportTask | undefined;
-    if (!task) {
-      const remote = await loadTaskStatus(taskId);
-      if (remote) {
-        memory.jobs.set(taskId, remote as unknown as Record<string, unknown>);
-        task = remote;
-      }
-    }
+    const task = await this.hydrate(taskId);
     if (!task || task.createdBy !== user.id) {
       throw new NotFoundException({
         error: { code: "NOT_FOUND", message: "任务不存在" },
@@ -253,20 +241,15 @@ export class TasksService {
       task.status = "cancelled";
       task.updatedAt = new Date().toISOString();
       task.finishedAt = task.updatedAt;
+      memory.jobs.set(taskId, task as unknown as Record<string, unknown>);
       await saveTaskStatus(task);
+      await persistJobRow(task);
     }
     return { status: task.status };
   }
 
   async retry(taskId: string, user: AuthUser) {
-    let task = memory.jobs.get(taskId) as unknown as ExportTask | undefined;
-    if (!task) {
-      const remote = await loadTaskStatus(taskId);
-      if (remote) {
-        memory.jobs.set(taskId, remote as unknown as Record<string, unknown>);
-        task = remote;
-      }
-    }
+    const task = await this.hydrate(taskId);
     if (!task || task.createdBy !== user.id) {
       throw new NotFoundException({
         error: { code: "NOT_FOUND", message: "任务不存在" },

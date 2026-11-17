@@ -3,11 +3,8 @@ import { extractDocument } from "@canvory/adapter-penpot";
 import type { CanvoryDocument } from "@canvory/document-model";
 import { ExportPanel } from "./ExportPanel.js";
 import { PreflightPanel } from "./PreflightPanel.js";
-import {
-  isPenpotHost,
-  readHostBoards,
-  type HostExtractResult,
-} from "../penpot-host.js";
+import type { HostExtractResult } from "../penpot-host.js";
+import { loadHostBoards } from "./host-client.js";
 import { apiFetch, saveDocument } from "../api.js";
 
 export function App() {
@@ -17,7 +14,7 @@ export function App() {
   const [saveHint, setSaveHint] = useState("");
 
   const refreshHost = useCallback(async () => {
-    const latest = await readHostBoards();
+    const latest = await loadHostBoards();
     setHost(latest);
     return latest;
   }, []);
@@ -32,7 +29,7 @@ export function App() {
     sceneIds: string[] | "all",
     sort: "position" | "name" = "position",
   ): Promise<CanvoryDocument> {
-    const latest = await readHostBoards();
+    const latest = await loadHostBoards();
     setHost(latest);
     const filtered =
       sceneIds === "all"
@@ -84,7 +81,7 @@ export function App() {
           刷新画板
         </button>
         <span style={{ marginLeft: "auto", fontSize: 11, color: "#666" }}>
-          {isPenpotHost() ? `宿主: Penpot (${host.source})` : "宿主: Demo 回退"}
+          {host.source === "penpot" ? "宿主: Penpot" : `宿主: Demo 回退 (${host.source})`}
           {documentId ? ` · doc ${documentId.slice(0, 8)}` : ""}
           {saveHint ? ` · ${saveHint}` : ""}
         </span>

@@ -16,7 +16,8 @@
 | RTG-05 | Core + PPTX Exporter | 2026-11-17 | core / exporters/pptx | |
 | RTG-06 | 最小 HTML Renderer | 2026-11-17 | web-min / viewer-min | |
 | RTG-07 | quickstart V2–V9 自动验收 | 2026-11-17 | quickstart-v1-v9.md（V1 SKIP） | |
-| FEAT-001 | 001-pptx-phase1 tasks 全勾 | 2026-11-17 | tasks.md | 含 SC-009 证据索引 |
+| FEAT-001 | 001-pptx-phase1 实现任务 | 2026-11-17 | tasks.md | T087 仍未勾 |
+| RM-03 | Postgres/Redis/MinIO 联调 | 2026-11-17 | docs/test/2-test-report/rm03-infra.md | USE_MEMORY_DB=0 且 EXPORT_INLINE=0 |
 
 ## 完成统计（滚动）
 

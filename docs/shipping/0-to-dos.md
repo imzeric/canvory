@@ -16,9 +16,7 @@
 
 | ID | 标题 | 阶段 | 优先级 | 验收 | 备注 |
 |----|------|------|--------|------|------|
-| RM-01 | Penpot 装插件跑 V1 | S0 | P0 | 登录 + plugins runtime + 三页导出可开 PPTX | 对齐 `1-confirmed` RM-01；原 RTG-03 |
-| RM-02 | 办公软件填 SC-005 | S1 | P0 | PP/WPS/Keynote/LibreOffice 无修复提示 | 对齐 RM-02；更新 compat-matrix |
-| RM-03 | Postgres/Redis/MinIO 联调 | S1 | P0 | 跨进程版本 + BullMQ 产物 + storageKey | 对齐 RM-03；原 BK-06 |
+| RM-02 | 办公软件填 SC-005 | S1 | P0 | PP/WPS/Keynote/LibreOffice 无修复提示 | 本次远程四款均为 BLOCKED-ENV；缺软件，未开始安装 |
 
 ## 其他待办
 

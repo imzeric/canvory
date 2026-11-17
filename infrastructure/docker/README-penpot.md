@@ -16,14 +16,21 @@ docker compose -f docker-compose.yml -f docker-compose.penpot.yml up -d
 ```
 
 - Canvory 基建：Postgres `:5432`、Redis `:6379`、MinIO `:9000`/`:9001`
-- Penpot UI：`http://localhost:9002`
-- `PENPOT_FLAGS` 含 **`enable-plugins-runtime`**
+- Penpot UI：`http://localhost:9002`（容器内前端监听 **8080**）
+- `PENPOT_FLAGS` 含 **`enable-feature-plugins`**（插件管理器开关；写在 frontend 与 backend）。另含注册、密码登录、关闭邮件验证，便于本地验收。
 
 ## 插件一键安装
 
-1. 托管插件静态资源（如 `pnpm --filter @canvory/penpot-plugin build` 后起静态站）。
-2. 将 `manifest.json` 暴露为 HTTPS（或本机 HTTP 开发）。
-3. 安装链接：`http://localhost:9002/#?plugin=<manifest-url>`
+1. `pnpm --filter @canvory/penpot-plugin build` 后托管 `dist/`（含 `manifest.json`、`plugin.js`、`index.html`）。
+2. 本地示例：`pnpm --filter @canvory/penpot-plugin exec vite preview --host 127.0.0.1 --port 4400`。
+3. 在设计文件编辑器内用插件管理器（Ctrl+Alt+P）安装：`http://127.0.0.1:4400/manifest.json`。
+   也可试：`http://localhost:9002/#?plugin=http://127.0.0.1:4400/manifest.json`。
+
+若整份 compose 因 `minio/minio` 镜像被拒绝而失败，可只启动 Penpot 所需服务：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.penpot.yml up -d postgres redis penpot-frontend penpot-backend penpot-exporter
+```
 
 ## CORS / HTTPS
 
@@ -34,7 +41,7 @@ docker compose -f docker-compose.yml -f docker-compose.penpot.yml up -d
 ## 验收清单
 
 - [ ] 可登录 Penpot
-- [ ] plugins runtime 已开启
+- [ ] `enable-feature-plugins` 已开启（插件管理器可用）
 - [ ] 可安装 Canvory PPTX 插件
 - [ ] 插件可读取画板并触发导出
 

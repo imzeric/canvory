@@ -62,7 +62,7 @@ describe("export tasks (V6)", () => {
   it("succeeds and only then exposes artifact; failed has no download", async () => {
     const docs = new DocumentsService();
     const tasks = new TasksService(docs);
-    const created = docs.create(user, "t", sampleCdm());
+    const created = await docs.create(user, "t", sampleCdm());
 
     const { taskId } = await tasks.create(user, {
       documentId: created.id,

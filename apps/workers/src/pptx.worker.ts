@@ -78,20 +78,56 @@ async function resolveStorageKeyToDataUrl(storageKey: string): Promise<string | 
   return `data:${mime};base64,${buf.toString("base64")}`;
 }
 
-async function saveRedisTask(task: Record<string, unknown>) {
+const TASK_PREFIX = "canvory:export-task:";
+const TASK_TTL_SEC = 60 * 60 * 24;
+/** 已取消的任务不允许被 Worker 覆盖成 running/succeeded/failed。 */
+const KEEP_CANCELLED_LUA = `
+local cur = redis.call('GET', KEYS[1])
+if cur then
+  local ok, decoded = pcall(cjson.decode, cur)
+  if ok and type(decoded) == 'table' and decoded['status'] == 'cancelled' then
+    return 0
+  end
+end
+redis.call('SET', KEYS[1], ARGV[1], 'EX', tonumber(ARGV[2]))
+return 1
+`;
+
+async function redisConn() {
   const url = process.env.REDIS_URL;
-  if (!url) return;
+  if (!url) return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mod: any = await import("ioredis");
   const RedisCtor = mod.default ?? mod.Redis ?? mod;
-  const redis = new RedisCtor(url);
+  return new RedisCtor(url);
+}
+
+async function readTaskStatus(taskId: string): Promise<string | undefined> {
+  const redis = await redisConn();
+  if (!redis) return undefined;
   try {
-    await redis.set(
-      `canvory:export-task:${task.id}`,
+    const raw = await redis.get(TASK_PREFIX + taskId);
+    if (!raw) return undefined;
+    return (JSON.parse(raw) as { status?: string }).status;
+  } finally {
+    redis.disconnect();
+  }
+}
+
+async function writeTaskUnlessCancelled(
+  task: Record<string, unknown>,
+): Promise<"written" | "cancelled" | "skipped"> {
+  const redis = await redisConn();
+  if (!redis) return "skipped";
+  try {
+    const n = await redis.eval(
+      KEEP_CANCELLED_LUA,
+      1,
+      TASK_PREFIX + String(task.id),
       JSON.stringify(task),
-      "EX",
-      60 * 60 * 24,
+      String(TASK_TTL_SEC),
     );
+    return Number(n) === 1 ? "written" : "cancelled";
   } finally {
     redis.disconnect();
   }
@@ -121,11 +157,19 @@ export async function processPptxJob(data: PptxJobData): Promise<{
   };
 
   try {
-    await saveRedisTask({
+    if ((await readTaskStatus(data.taskId)) === "cancelled") {
+      return { ok: false, errorMessage: "cancelled" };
+    }
+
+    const runningWrite = await writeTaskUnlessCancelled({
       ...base,
       status: "running",
       progress: 10,
+      updatedAt: now(),
     });
+    if (runningWrite === "cancelled") {
+      return { ok: false, errorMessage: "cancelled" };
+    }
 
     const cdm = parseCanvoryDocument(data.document);
     const result = await buildPptx(cdm, {
@@ -137,10 +181,14 @@ export async function processPptxJob(data: PptxJobData): Promise<{
     const artifactKey = `exports/${data.taskId}.pptx`;
     const mime =
       "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    if ((await readTaskStatus(data.taskId)) === "cancelled") {
+      return { ok: false, errorMessage: "cancelled" };
+    }
+
     await putMinio(artifactKey, result.buffer, mime);
     const assetId = randomUUID();
 
-    await saveRedisTask({
+    const successWrite = await writeTaskUnlessCancelled({
       ...base,
       status: "succeeded",
       progress: 100,
@@ -150,15 +198,21 @@ export async function processPptxJob(data: PptxJobData): Promise<{
       finishedAt: now(),
       artifactKey,
     });
+    if (successWrite === "cancelled") {
+      return { ok: false, errorMessage: "cancelled" };
+    }
 
     return { ok: true, artifactKey, report: result.report };
   } catch (e) {
+    if ((await readTaskStatus(data.taskId)) === "cancelled") {
+      return { ok: false, errorMessage: "cancelled" };
+    }
     const failureArtifactKey = `exports/failures/${data.taskId}.log`;
     const errorMessage = e instanceof Error ? e.message : String(e);
     await putMinio(failureArtifactKey, Buffer.from(errorMessage, "utf8"), "text/plain").catch(
       () => undefined,
     );
-    await saveRedisTask({
+    const failedWrite = await writeTaskUnlessCancelled({
       ...base,
       status: "failed",
       progress: 0,
@@ -167,6 +221,9 @@ export async function processPptxJob(data: PptxJobData): Promise<{
       updatedAt: now(),
       finishedAt: now(),
     });
+    if (failedWrite === "cancelled") {
+      return { ok: false, errorMessage: "cancelled" };
+    }
     return { ok: false, failureArtifactKey, errorMessage };
   }
 }

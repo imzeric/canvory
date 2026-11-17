@@ -20,6 +20,8 @@ services:
     networks:
       - canvory_net
 
+  # 2026-11 起 Docker Hub 上 minio/minio 可能返回 pull access denied。
+  # Penpot 不依赖此服务；对象存储联调可用同版本二进制。见 docs/test/2-test-report/rm03-infra.md。
   minio:
     image: minio/minio:RELEASE.2024-12-18T13-15-44Z
     command: server /data --console-address ":9001"

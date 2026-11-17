@@ -7,9 +7,9 @@
 
 | ID | 标题 | 负责人 | 开始日期 | 当前进展 | 阻塞 | 预计完成 |
 |----|------|--------|----------|----------|------|----------|
-| RTG-03 | Penpot 自托管实机 | — | 2026-11-17 | compose overlay + README 已齐 | 需 Docker 拉镜像 | 本周 |
+| RM-01 / RTG-03 | Penpot 自托管实机 | — | 2026-11-17 | 2.4.3 已在 :9002 起来，插件标志已开 | 浏览器未完成三页下载 | 未完成 |
 
 ## 本日焦点
 
-- `docker compose -f docker-compose.yml -f docker-compose.penpot.yml up -d`
-- 安装插件后补齐 V1 人工验收
+- Penpot 已在 `http://127.0.0.1:9002` 启动；插件静态站 `http://127.0.0.1:4400/manifest.json`
+- 浏览器三页导出下载仍未完成，V1 保持 SKIP

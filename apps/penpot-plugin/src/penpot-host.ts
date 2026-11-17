@@ -17,12 +17,12 @@ export type HostExtractResult = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var penpot: PenpotHostApi | undefined;
 }
 
 /** 官方 Plugin Context 的最小子集 */
 interface PenpotHostApi {
+  theme?: string;
   ui?: { open?: (title: string, url: string, options?: { width?: number; height?: number }) => void };
   selection?: PenpotShape[];
   currentFile?: { name?: string; id?: string } | null;
