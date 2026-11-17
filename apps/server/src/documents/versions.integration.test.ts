@@ -57,7 +57,7 @@ describe("versions restore = copy new version (V7)", () => {
 
   it("restore copies snapshot as new version without deleting history", async () => {
     const docs = new DocumentsService();
-    const created = docs.create(user, "v1", sampleCdm("v1-content"));
+    const created = await docs.create(user, "v1", sampleCdm("v1-content"));
     await docs.putVersion(created.id, user, sampleCdm("v2-content"));
     const before = await docs.listVersions(created.id, user);
     expect(before).toHaveLength(2);

@@ -23,4 +23,4 @@ YYYYMMDD-<用例或批次ID>-<简短描述>.md
 
 ## 当前归档
 
-（尚无报告）
+2026-11-17 远程记录在本目录：`remote-acceptance-7484.md`（浏览器三页内容与脚本 V1 分开）、`sc009-evidence.md`、`quickstart-v1-v9.md`（脚本 PASS 8 / SKIP 1）、`rm03-infra.md`、`sc003-measure.md`（SKIP）、`compat-matrix.md`（四软件未验证）、`sc008-usability.md`（样本 0）。

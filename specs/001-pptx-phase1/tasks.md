@@ -187,7 +187,7 @@ Monorepo（见 plan.md）：`apps/`、`packages/`、`fixtures/`、`infrastructur
 
 - [X] T057 [P] 补齐 `fixtures/golden/README.md` 覆盖表中全部 G-* 样例文件与期望报告摘要
 - [X] T058 实现/记录 SC-001–003 于 `fixtures/golden/metrics.md`：含 LibreOffice 无头渲染命令、锚点抽样、分母分子；SC-004 计时规程（点击→可下载，墙钟/performance.now）与不达标记缺陷模板
-- [X] T059 执行 `specs/001-pptx-phase1/quickstart.md` V1–V9（含 ≤20 页 30s 计时），结果写入 `docs/test/0-tested.md` 与 `docs/test/2-test-report/`
+- [X] T059 执行 `specs/001-pptx-phase1/quickstart.md` V1–V9（含 ≤20 页 30s 计时），结果写入 `docs/test/0-tested.md` 与 `docs/test/2-test-report/`。脚本汇总保持 PASS 8 / FAIL 0 / SKIP 1：V1 不打开浏览器，仍 SKIP。独立的 Penpot 浏览器下载记在 `remote-acceptance-7484.md`，不回写这条自动化计数。
 - [X] T060 [P] 跨软件兼容矩阵（PowerPoint/WPS/Keynote/LibreOffice）记录于 `docs/test/2-test-report/`
 - [X] T061 同步 `docs/shipping/0-to-dos.md` / `1-doing.md` / `2-done.md` 与本任务进度
 - [X] T062 [P] 更新 `docs/plan/1-confirmed.md`：纳入 FR-016、恢复语义、后台提示规则、Penpot 部署与 Asset 管道等决策
@@ -318,4 +318,4 @@ Task: "tasks.service.ts state machine"
 - [X] T084 扩展宿主映射：Penpot 文本多 run 样式写入 `content.runs`；图片经 `shape.export`（或等价）写入 `doc.assets` dataUrl/storageKey，避免空图/单样式坍缩 per FR-006 / FR-002 / US3/AC1 (partial)
 - [X] T085 插件 L2 路径注入真实栅格化（优先 Penpot `Shape.export` / canvas），替换默认 1×1 占位 PNG，且禁止回写 CDM per FR-005 / US2/AC2 / FR-015 (partial)
 - [X] T086 [P] `ExportPanel` 后台取消调用 `POST .../cancel`；`TasksService.retry` 保留原 `scope` per FR-012b / US5/AC4 (partial)
-- [ ] T087 完成 SC-005 四软件实机打开并更新 `docs/test/2-test-report/compat-matrix.md`（消除 BLOCKED-ENV），作为 SC-009 证据 per SC-005 / SC-009 / RM-02 (partial)
+- [ ] T087 **本阶段豁免（2026-11-17，非阻断）** SC-005 四软件实机打开不再作为 SC-009 证据。历史 BLOCKED-ENV 保留在 `compat-matrix.md`，不勾选、不记 PASS。后续若恢复，仍须四款软件真实打开且无修复提示。

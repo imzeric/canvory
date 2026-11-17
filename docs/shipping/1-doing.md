@@ -5,11 +5,9 @@
 
 ## 进行中
 
-| ID | 标题 | 负责人 | 开始日期 | 当前进展 | 阻塞 | 预计完成 |
-|----|------|--------|----------|----------|------|----------|
-| RTG-03 | Penpot 自托管实机 | — | 2026-11-17 | compose overlay + README 已齐 | 需 Docker 拉镜像 | 本周 |
+无。RM-01 已有浏览器下载证据，记在 `2-done.md`。
 
 ## 本日焦点
 
-- `docker compose -f docker-compose.yml -f docker-compose.penpot.yml up -d`
-- 安装插件后补齐 V1 人工验收
+- Penpot 三页内容闭环已核对，见 `docs/test/2-test-report/remote-acceptance-7484.md`
+- quickstart 脚本 V1 仍 SKIP；SC-003 仍 SKIP；SC-005 / SC-008 仍是豁免

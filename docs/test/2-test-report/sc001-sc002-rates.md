@@ -1,6 +1,6 @@
 # SC-001 / SC-002 自动计量
 
-**日期**: 2026-11-17T08:27:51.085Z  
+**日期**: 2026-11-17T13:17:03.846Z  
 **模式**: auto  
 **样例**: G-FX-01.json, G-GROUP-01.json, G-IMG-01.json, G-NOTES-01.json, G-SHAPE-01.json, G-SHAPE-02.json, G-SKIP-01.json, G-TEXT-01.json, G-TEXT-02.json
 

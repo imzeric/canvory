@@ -80,7 +80,7 @@ export class DocumentsService {
     return doc;
   }
 
-  create(user: AuthUser, title: string, cdmInput?: unknown) {
+  async create(user: AuthUser, title: string, cdmInput?: unknown) {
     const parsed = parseCanvoryDocument(cdmInput ?? blankDocument(title));
     const id = parsed.id || randomUUID();
     const versionId = randomUUID();
@@ -101,9 +101,10 @@ export class DocumentsService {
         },
       ],
     });
-    void ensureUser(user.id, user.email, user.displayName)
-      .then(() => insertDocument(id, user.id, parsed.title, versionId, cdmDoc))
-      .catch((e) => console.error("[pg] insertDocument", e));
+    if (postgresEnabled()) {
+      await ensureUser(user.id, user.email, user.displayName);
+      await insertDocument(id, user.id, parsed.title, versionId, cdmDoc);
+    }
     return {
       id,
       title: parsed.title,
@@ -144,9 +145,9 @@ export class DocumentsService {
     });
     doc.title = parsed.title;
     doc.updatedAt = now;
-    void insertVersion(id, versionNo, parsed, user.id, label).catch((e) =>
-      console.error("[pg] insertVersion", e),
-    );
+    if (postgresEnabled()) {
+      await insertVersion(id, versionNo, parsed, user.id, versionId, label);
+    }
     return { id: versionId, version: versionNo };
   }
 

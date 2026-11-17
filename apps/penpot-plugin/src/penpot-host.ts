@@ -17,12 +17,12 @@ export type HostExtractResult = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var penpot: PenpotHostApi | undefined;
 }
 
 /** 官方 Plugin Context 的最小子集 */
 interface PenpotHostApi {
+  theme?: string;
   ui?: { open?: (title: string, url: string, options?: { width?: number; height?: number }) => void };
   selection?: PenpotShape[];
   currentFile?: { name?: string; id?: string } | null;
@@ -41,6 +41,8 @@ interface PenpotFill {
   fillOpacity?: number;
   color?: string;
   opacity?: number;
+  /** Penpot 把图片画成带 fillImage 的 rectangle，而不是 type=image。 */
+  fillImage?: { id?: string } | null;
 }
 
 interface PenpotStroke {
@@ -180,13 +182,52 @@ const DEMO_ASSETS: AssetRef[] = [
   },
 ];
 
-function bytesToDataUrl(bytes: Uint8Array, mime = "image/png"): string {
-  let binary = "";
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+const BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+/**
+ * 把导出字节编成 data URL。
+ * Penpot 插件跑在 SES 隔间里，未绑定的 `btoa` 会抛 Illegal invocation；
+ * 大块 `String.fromCharCode(...chunk)` 也会超出参数个数。这里按字节手写编码。
+ */
+export function bytesToDataUrl(bytes: ArrayLike<number>, mime = "image/png"): string {
+  let encoded = "";
+  const length = bytes.length;
+  for (let i = 0; i < length; i += 3) {
+    const a = bytes[i] ?? 0;
+    const hasB = i + 1 < length;
+    const hasC = i + 2 < length;
+    const b = hasB ? (bytes[i + 1] ?? 0) : 0;
+    const c = hasC ? (bytes[i + 2] ?? 0) : 0;
+    const triple = ((a & 255) << 16) | ((b & 255) << 8) | (c & 255);
+    encoded += BASE64_ALPHABET[(triple >> 18) & 63] ?? "";
+    encoded += BASE64_ALPHABET[(triple >> 12) & 63] ?? "";
+    encoded += hasB ? (BASE64_ALPHABET[(triple >> 6) & 63] ?? "") : "=";
+    encoded += hasC ? (BASE64_ALPHABET[triple & 63] ?? "") : "=";
   }
-  return `data:${mime};base64,${btoa(binary)}`;
+  return `data:${mime};base64,${encoded}`;
+}
+
+/** 接受跨隔间的类 Uint8Array（不能用 instanceof）。空载荷返回 null。 */
+export function dataUrlFromExportBytes(payload: unknown, mime = "image/png"): string | null {
+  if (typeof payload === "string") {
+    return payload.startsWith("data:") ? payload : null;
+  }
+  if (!payload || typeof payload !== "object") return null;
+  const record = payload as { length?: unknown; byteLength?: unknown; [index: number]: unknown };
+  const length =
+    typeof record.byteLength === "number"
+      ? record.byteLength
+      : typeof record.length === "number"
+        ? record.length
+        : null;
+  if (length == null || length <= 0) return null;
+  const copy = new Uint8Array(length);
+  for (let i = 0; i < length; i += 1) {
+    const value = record[i];
+    if (typeof value !== "number") return null;
+    copy[i] = value;
+  }
+  return bytesToDataUrl(copy, mime);
 }
 
 function mapType(typeRaw: string | undefined): PenpotShapeInput["type"] {
@@ -274,8 +315,7 @@ async function exportPngDataUrl(shape: PenpotShape): Promise<string | null> {
   if (typeof shape.export !== "function") return null;
   try {
     const bytes = await shape.export({ type: "png", scale: 2 });
-    if (!bytes?.length) return null;
-    return bytesToDataUrl(bytes, "image/png");
+    return dataUrlFromExportBytes(bytes, "image/png");
   } catch {
     return null;
   }
@@ -286,7 +326,7 @@ async function mapShape(
   assetBag: Map<string, AssetRef>,
   opts?: { exportImages?: boolean },
 ): Promise<PenpotShapeInput> {
-  const type = mapType(raw.type);
+  const type = hasImageFill(raw) ? "image" : mapType(raw.type);
   const children: PenpotShapeInput[] = [];
   if (raw.children?.length) {
     for (const c of raw.children) {
@@ -357,9 +397,21 @@ async function mapShape(
   };
 }
 
-function isBoard(shape: PenpotShape): boolean {
+/** Penpot 页面根画板的固定 id。它的尺寸通常不是用户画板，不能当作一页。 */
+export const PENPOT_ROOT_FRAME_ID = "00000000-0000-0000-0000-000000000000";
+
+export function isUserArtboard(shape: { id?: string; type?: string }): boolean {
+  if (!shape.id || shape.id === PENPOT_ROOT_FRAME_ID) return false;
   const t = (shape.type ?? "").toLowerCase();
   return t === "board" || t === "frame";
+}
+
+function isBoard(shape: PenpotShape): boolean {
+  return isUserArtboard(shape);
+}
+
+function hasImageFill(shape: PenpotShape): boolean {
+  return Boolean(shape.fills?.some((fill) => fill.fillImage));
 }
 
 async function boardsFromShapes(

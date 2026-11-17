@@ -4,7 +4,8 @@ import { walkNodes, type DegradeLevel, type DegradeResult } from "./degrade.js";
 import { assertUniformSceneSizes } from "./size-guard.js";
 import { collectFonts } from "./font-map.js";
 
-export interface ExportReportItem extends DegradeResult {}
+/** 与降级结果同一结构；用类型别名避免空接口。 */
+export type ExportReportItem = DegradeResult;
 
 export interface ExportReportPage {
   sceneId: string;

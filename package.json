@@ -15,7 +15,8 @@
     "validate:quickstart": "tsx scripts/validate-quickstart.mts",
     "validate:sc-rates": "tsx scripts/sc-rates.mts",
     "validate:sc003": "tsx scripts/sc003-measure.mts",
-    "validate:pptx-smoke": "tsx scripts/pptx-structure-smoke.mts"
+    "validate:pptx-smoke": "tsx scripts/pptx-structure-smoke.mts",
+    "validate:rm03": "pnpm --filter @canvory/server exec tsx scripts/rm03-infra-verify.mts"
   },
   "dependencies": {
     "@canvory/core": "workspace:*",

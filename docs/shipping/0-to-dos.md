@@ -16,13 +16,11 @@
 
 | ID | 标题 | 阶段 | 优先级 | 验收 | 备注 |
 |----|------|------|--------|------|------|
-| RM-01 | Penpot 装插件跑 V1 | S0 | P0 | 登录 + plugins runtime + 三页导出可开 PPTX | 对齐 `1-confirmed` RM-01；原 RTG-03 |
-| RM-02 | 办公软件填 SC-005 | S1 | P0 | PP/WPS/Keynote/LibreOffice 无修复提示 | 对齐 RM-02；更新 compat-matrix |
-| RM-03 | Postgres/Redis/MinIO 联调 | S1 | P0 | 跨进程版本 + BullMQ 产物 + storageKey | 对齐 RM-03；原 BK-06 |
+| RM-02 | 办公软件填 SC-005 | 后续 | — | 四款软件无修复提示 | 2026-11-17 豁免，非本阶段阻断。本次 BLOCKED-ENV 保留 |
 
 ## 其他待办
 
 | ID | 标题 | 阶段 | 优先级 | 验收 | 备注 |
 |----|------|------|--------|------|------|
-| SC-008 | 可用性试用满 5 人 | S1 | P1 | sc008-usability.md | 不单独否决 SC-009 |
+| SC-008 | 可用性试用满 5 人 | 后续 | — | sc008-usability.md | 2026-11-17 豁免，非阻断。样本仍为 0 |
 | BK-05 | HTML 发布与分享链接 | S2 | P2 | — | |

@@ -54,9 +54,9 @@ export async function insertVersion(
   versionNo: number,
   cdm: CanvoryDocument,
   createdBy: string,
+  versionId: string = randomUUID(),
   label?: string,
 ): Promise<string> {
-  const versionId = randomUUID();
   if (!postgresEnabled()) return versionId;
   const pool = getPool();
   await pool.query(

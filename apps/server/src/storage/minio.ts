@@ -18,11 +18,11 @@ export function storageConfigured(): boolean {
 
 export async function putObject(
   key: string,
-  buffer: Buffer,
+  buffer: Uint8Array,
   mime: string,
 ): Promise<{ storageKey: string }> {
   if (!storageConfigured()) {
-    memObjects.set(key, { key, mime, buffer });
+    memObjects.set(key, { key, mime, buffer: Buffer.from(buffer) });
     return { storageKey: key };
   }
 
@@ -38,7 +38,8 @@ export async function putObject(
   const bucket = process.env.MINIO_BUCKET ?? "canvory";
   const exists = await client.bucketExists(bucket);
   if (!exists) await client.makeBucket(bucket, "us-east-1");
-  await client.putObject(bucket, key, buffer, buffer.byteLength, {
+  const body = Buffer.from(buffer);
+  await client.putObject(bucket, key, body, body.byteLength, {
     "Content-Type": mime,
   });
   return { storageKey: key };
@@ -73,7 +74,7 @@ export async function getObject(key: string): Promise<StoredObject | null> {
 export async function storeExportArtifact(
   assetId: string,
   key: string,
-  buffer: Buffer,
+  buffer: Uint8Array,
   mime: string,
 ): Promise<void> {
   await putObject(key, buffer, mime);

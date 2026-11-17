@@ -14,7 +14,7 @@ export interface PluginExportRequest {
 }
 
 export async function runBrowserExport(req: PluginExportRequest): Promise<{
-  buffer: Buffer;
+  buffer: Uint8Array;
   report: ReturnType<typeof preflight>;
 }> {
   if (req.signal?.aborted) {
@@ -43,5 +43,5 @@ export async function runBrowserExport(req: PluginExportRequest): Promise<{
   return result;
 }
 
-// Penpot 插件宿主可在此注册消息通道；无宿主时保持模块可导入
+// Penpot 插件宿主入口见 src/plugin.ts。此模块保持可导入，不在 UI 包里打开面板。
 export const PLUGIN_READY = true;
