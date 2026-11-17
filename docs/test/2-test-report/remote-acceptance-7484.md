@@ -19,7 +19,7 @@
 | RM-01 Penpot 实机导出 | BLOCKED | 见下 | — | 服务起来了，三页下载没有完成 |
 | SC-005 四款软件 | BLOCKED-ENV | `command -v` / `dpkg -l` | — | PowerPoint、WPS、Keynote、LibreOffice 都不在这台机器上。T087 未勾 |
 | SC-008 五人试用 | BLOCKED | 查 `sc008-usability.md` | — | 没有真实参与者记录。脚本在 `sc008-trial-script.md`。未发邀请 |
-| SC-009 | 未成立 | — | — | 兼容与 Penpot 下载仍缺 |
+| SC-009 | 未成立 | — | — | SC-005/SC-008 已豁免。Penpot 下载到的 3 页 PPTX 没有文本、矩形、图片内容 |
 
 ## RM-03 覆盖
 
@@ -41,6 +41,24 @@
 3. 做三个同尺寸画板（文本、矩形、图片），范围全部、模式 auto、不要勾后台导出，点「导出」
 4. 只有界面写着「宿主: Penpot」并且下载到 pptx，才能把 V1 改成 PASS
 
+## 2026-11-17 豁免
+
+用户要求把四款办公软件（SC-005 / T087 / RM-02）和五人真实试用（SC-008）从本阶段发布阻断里拿掉。规格、看板和本记录已改成「豁免、后续项」。历史 BLOCKED-ENV 和样本为 0 都还在，没有改成通过。SC-003 不在这次豁免里。
+
+## SC-003 为什么是 SKIP
+
+测量规程写在 `fixtures/golden/metrics.md`：用 LibreOffice 的 `soffice --headless --convert-to pdf` 把 PPTX 渲成 PDF，再用 `pdftoppm` 得到 PNG，把图上的元素中心和 CDM `transform` 中心比较。阈值仍是页宽的 0.5%，没有改。
+
+`scripts/sc003-measure.mts` 只查找 PATH 里的 `soffice` 或 `libreoffice`。找不到就写 SKIP 并退出 0。找到了也只做 PDF 转换，中心点误差仍要按 metrics 再测。这次用户只问原因，没有要求重新安装或开跑，所以继续 SKIP，不算通过。
+
+## Penpot 三页导出（同一次远程浏览器）
+
+- 插件面板是仓库里的 UI：`宿主: Penpot`，画板 `文本` / `矩形` / `图片`，模式 `auto`，未勾后台导出。预检能打开。截图见 PR 附件。
+- 浏览器导出不再报 `nodebuffer is not supported`。修复是：有 DOM 时 `pptxgenjs` 用 `uint8array`。
+- 页面根画板 `00000000-0000-0000-0000-000000000000` 不再被当成一页，避免和 1920×1080 的用户画板一起触发 `SIZE_MISMATCH`。
+- Penpot 的图片是 `rectangle` + `fillImage`，现已按图片导出。
+- 实际下载的 `New File 8.pptx` 有 3 页，但三页里没有 `IT7484-PENPOT-TEXT`，没有图片部件，也没有矩形形状。画出来的图片落在画板外面，文本和矩形没有成为这三块画板的子图层。所以不能把这次下载记成内容闭环通过。
+
 ## 仍开放
 
-T087、RM-01、RM-02、SC-005、SC-008、SC-009。SC-003 维持 SKIP。
+RM-01（三页内容要进 PPTX）、SC-009。SC-003 维持 SKIP。SC-005 / T087 / SC-008 是豁免后的后续项，不是本阶段阻断。

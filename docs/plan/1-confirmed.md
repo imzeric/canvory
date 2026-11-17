@@ -63,7 +63,7 @@
 | ID | 项 | 验收标准 | 证据落点 | 阻塞 |
 |----|----|----------|----------|------|
 | RM-01 | Penpot 装插件跑 V1 | 自托管可登录；plugins runtime 开；安装 Canvory 插件；三页（文本+矩形+图片）浏览器导出可打开 PPTX | `quickstart` V1 记录；更新 `0-tested.md` | SC-009 演示闭环 / RTG-03 |
-| RM-02 | 办公软件填 SC-005 | 黄金样例产物在 PowerPoint、WPS、Keynote、LibreOffice **均无修复提示**；矩阵「待测/BLOCKED」清零 | `compat-matrix.md` 勾选通过 | SC-005 / SC-009 |
+| RM-02 | 办公软件填 SC-005 | 黄金样例在四款软件中无修复提示 | 2026-11-17 起为后续项，不阻断 SC-009。历史 BLOCKED-ENV 保留 | 非阻断 |
 | RM-03 | Postgres / Redis / MinIO 联调 | `USE_MEMORY_DB≠1`；`DATABASE_URL`+`REDIS_URL`+`MINIO_*`；文档版本跨进程可读；BullMQ 任务 succeeded 可下产物；Asset `storageKey` 可取字节 | 联调记录入 `2-test-report/`；可选写 `.env` 清单（勿提交密钥） | FR-011 / FR-012 / BK-06 |
 
 ### 操作指引（确认路径，不替代执行）
@@ -80,7 +80,7 @@
 
 | 项 | 状态说明 |
 |----|----------|
-| SC-008 可用性试用 ≥5 人 | 未满样本标「试用未完成」；**不单独否决** SC-009，但发布说明 MUST 标注 |
+| SC-008 可用性试用 ≥5 人 | 2026-11-17 用户豁免：不再阻断本阶段发布。样本仍为 0，不记通过 |
 | SC-003 LibreOffice 锚点误差 | 有 soffice 后跑 `pnpm validate:sc003`；无则保持 SKIP 记录 |
 
 ## 第一阶段未达标 / 未完成（已确认跟踪）
@@ -94,7 +94,7 @@
 | ID | 项 | 当前状态 | 缺口 | 证据 / 台账 |
 |----|----|----------|------|-------------|
 | RM-01 | Penpot 装插件跑 V1 | **未完成** | 2026-11-17 远程：Penpot 2.4.3 可打开，`enable-feature-plugins` 已写入 config.js。浏览器会话未完成三页下载，无 PPTX 产物。quickstart **V1 = SKIP** | `remote-acceptance-7484.md`；`1-doing` RTG-03 |
-| RM-02 | 办公软件填 SC-005 | **未达标** | 本次远程 PowerPoint / WPS / Keynote / LibreOffice 均为 `BLOCKED-ENV`。ZIP 冒烟不是打开结果。**T087** 未勾 | `compat-matrix.md`；tasks T087 |
+| RM-02 | 办公软件填 SC-005 | **豁免，未验证** | 2026-11-17 不再阻断。本次远程四款仍为 BLOCKED-ENV，T087 不勾 | `compat-matrix.md` |
 | RM-03 | Postgres / Redis / MinIO 联调 | **已完成（本次远程）** | `USE_MEMORY_DB=0`、`EXPORT_INLINE=0`：401、跨进程版本恢复、BullMQ 成功下载、取消 404、storageKey 图片进入 PPTX | `rm03-infra.md` |
 
 **SC-009 交叉状态**
@@ -102,7 +102,7 @@
 | 要求 | 状态 |
 |------|------|
 | 完整元素映射 + 预检报告 | 实现 ✓（自动验收 / fixtures） |
-| 跨软件兼容达标（SC-005） | **未达标** ← RM-02 |
+| 跨软件兼容（SC-005） | **豁免**，不计入本阶段 SC-009。历史未验证保留 |
 | 文档版本恢复 | 跨进程实机 ✓（`rm03-infra.md`） |
 | 后台导出任务 | BullMQ + MinIO 实机 ✓（`rm03-infra.md`） |
 | 演示闭环（Penpot UI） | **未完成** ← RM-01 |
@@ -117,11 +117,11 @@
 | SC-002 基础图形原生率 | ≥90% | 同上 PASS | 达标（样例集） |
 | SC-003 位置误差 ≤0.5% 页宽 | LibreOffice 无头测锚点 | **SKIP**（本次未安装 soffice；不能当成兼容通过） | 未测 |
 | SC-004 ≤20 页 / 30s | 墙钟可测 | 单页 CLI PASS；大页数实机未记 | 部分 |
-| SC-005 四软件无修复提示 | 100% | 本次远程四款 BLOCKED-ENV | **未达标** |
+| SC-005 四软件无修复提示 | 100% | 本次远程四款 BLOCKED-ENV | **豁免 / 未验证** |
 | SC-006 L2/L3 全入报告 | 100% | V3 自动 PASS | 达标（自动） |
 | SC-007 手工 CDM + 最小 HTML | 架构护栏 | V8 PASS | 达标 |
-| SC-008 可用性 ≥5 人 / ≥90% | 试用协议 | **试用未完成**（样本不足） | 未完成；不单独否决 SC-009，发布说明 MUST 标注 |
-| SC-009 发布总门禁 | 映射+预检+兼容+版本+后台 | 兼容与实机联调未齐 | **未成立** |
+| SC-008 可用性 ≥5 人 / ≥90% | 试用协议 | 样本 0 | **豁免 / 未开展** |
+| SC-009 发布总门禁 | 映射+预检+Penpot 下载+版本+后台 | 版本与后台已有实机记录；Penpot 下载见当次报告 | 以当次 Penpot 下载结果为准 |
 
 ### C. 旁路未完成（确认跟踪，非本清单「三 RM」等价）
 
@@ -135,11 +135,11 @@
 
 | 列 | 应对未完成项 |
 |----|----------------|
-| `0-to-dos.md` | RM-01 / RM-02 / RM-03 / SC-008 保持待办直至证据齐全 |
+| `0-to-dos.md` | RM-02 / SC-008 放在后续非阻断；RM-01 在进行中直至 Penpot 下载有证据 |
 | `1-doing.md` | RTG-03（Penpot 实机）与 RM-01 同义；开始做时迁入并更新进展 |
 | `2-done.md` | 仅在有 `docs/test` 证据后迁入；**禁止**仅因代码合并即勾 RM / SC-005 |
 
-完成 RM-0x 后：更新本表「当前状态」→ 迁 shipping → 补 `0-tested.md` / `2-test-report/` →（RM-02）勾选 tasks **T087**。
+完成仍有效的门禁后：更新本表「当前状态」→ 迁 shipping → 补 `0-tested.md`。T087 在豁免期间不勾选。
 
 ## 变更记录
 

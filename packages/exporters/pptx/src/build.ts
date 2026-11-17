@@ -8,6 +8,7 @@ import {
   type ExportMode,
   type RasterizeFn,
 } from "@canvory/core";
+import { pptxWriteOutputType } from "./output-type.js";
 import { selectScenes, type ExportScope } from "./scope.js";
 import { addTextBox } from "./text.js";
 import { addShape, addSimplePath } from "./shapes.js";
@@ -104,7 +105,7 @@ async function addNode(
 export async function buildPptx(
   doc: CanvoryDocument,
   options: BuildPptxOptions = {},
-): Promise<{ buffer: Buffer; report: ReturnType<typeof preflight> }> {
+): Promise<{ buffer: Uint8Array; report: ReturnType<typeof preflight> }> {
   const mode = options.mode ?? "auto";
   const scope = options.scope ?? { sceneIds: "all" as const };
   const pageSize = assertUniformSceneSizes(doc, scope.sceneIds);
@@ -135,6 +136,7 @@ export async function buildPptx(
     }
   }
 
-  const output = await pptx.write({ outputType: "nodebuffer" });
-  return { buffer: output, report };
+  const output = await pptx.write({ outputType: pptxWriteOutputType() });
+  const buffer = output instanceof Uint8Array ? output : new Uint8Array(output);
+  return { buffer, report };
 }

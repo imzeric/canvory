@@ -318,4 +318,4 @@ Task: "tasks.service.ts state machine"
 - [X] T084 扩展宿主映射：Penpot 文本多 run 样式写入 `content.runs`；图片经 `shape.export`（或等价）写入 `doc.assets` dataUrl/storageKey，避免空图/单样式坍缩 per FR-006 / FR-002 / US3/AC1 (partial)
 - [X] T085 插件 L2 路径注入真实栅格化（优先 Penpot `Shape.export` / canvas），替换默认 1×1 占位 PNG，且禁止回写 CDM per FR-005 / US2/AC2 / FR-015 (partial)
 - [X] T086 [P] `ExportPanel` 后台取消调用 `POST .../cancel`；`TasksService.retry` 保留原 `scope` per FR-012b / US5/AC4 (partial)
-- [ ] T087 完成 SC-005 四软件实机打开并更新 `docs/test/2-test-report/compat-matrix.md`（消除 BLOCKED-ENV），作为 SC-009 证据 per SC-005 / SC-009 / RM-02 (partial)
+- [ ] T087 **本阶段豁免（2026-11-17，非阻断）** SC-005 四软件实机打开不再作为 SC-009 证据。历史 BLOCKED-ENV 保留在 `compat-matrix.md`，不勾选、不记 PASS。后续若恢复，仍须四款软件真实打开且无修复提示。

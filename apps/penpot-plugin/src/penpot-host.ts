@@ -41,6 +41,8 @@ interface PenpotFill {
   fillOpacity?: number;
   color?: string;
   opacity?: number;
+  /** Penpot 把图片画成带 fillImage 的 rectangle，而不是 type=image。 */
+  fillImage?: { id?: string } | null;
 }
 
 interface PenpotStroke {
@@ -286,7 +288,7 @@ async function mapShape(
   assetBag: Map<string, AssetRef>,
   opts?: { exportImages?: boolean },
 ): Promise<PenpotShapeInput> {
-  const type = mapType(raw.type);
+  const type = hasImageFill(raw) ? "image" : mapType(raw.type);
   const children: PenpotShapeInput[] = [];
   if (raw.children?.length) {
     for (const c of raw.children) {
@@ -357,9 +359,21 @@ async function mapShape(
   };
 }
 
-function isBoard(shape: PenpotShape): boolean {
+/** Penpot 页面根画板的固定 id。它的尺寸通常不是用户画板，不能当作一页。 */
+export const PENPOT_ROOT_FRAME_ID = "00000000-0000-0000-0000-000000000000";
+
+export function isUserArtboard(shape: { id?: string; type?: string }): boolean {
+  if (!shape.id || shape.id === PENPOT_ROOT_FRAME_ID) return false;
   const t = (shape.type ?? "").toLowerCase();
   return t === "board" || t === "frame";
+}
+
+function isBoard(shape: PenpotShape): boolean {
+  return isUserArtboard(shape);
+}
+
+function hasImageFill(shape: PenpotShape): boolean {
+  return Boolean(shape.fills?.some((fill) => fill.fillImage));
 }
 
 async function boardsFromShapes(

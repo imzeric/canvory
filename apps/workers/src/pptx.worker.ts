@@ -33,7 +33,7 @@ function minioClient() {
   });
 }
 
-async function putMinio(key: string, buffer: Buffer, mime: string) {
+async function putMinio(key: string, buffer: Uint8Array, mime: string) {
   const client = await minioClient();
   if (!client) {
     return { storageKey: key, uploaded: false };
@@ -42,7 +42,8 @@ async function putMinio(key: string, buffer: Buffer, mime: string) {
   if (!(await client.bucketExists(bucket))) {
     await client.makeBucket(bucket, "us-east-1");
   }
-  await client.putObject(bucket, key, buffer, buffer.byteLength, {
+  const body = Buffer.from(buffer);
+  await client.putObject(bucket, key, body, body.byteLength, {
     "Content-Type": mime,
   });
   return { storageKey: key, uploaded: true };
@@ -185,7 +186,7 @@ export async function processPptxJob(data: PptxJobData): Promise<{
       return { ok: false, errorMessage: "cancelled" };
     }
 
-    await putMinio(artifactKey, result.buffer, mime);
+    await putMinio(artifactKey, Buffer.from(result.buffer), mime);
     const assetId = randomUUID();
 
     const successWrite = await writeTaskUnlessCancelled({

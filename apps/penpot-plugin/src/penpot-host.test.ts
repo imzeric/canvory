@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { parseTextRuns } from "./penpot-host.js";
+import { isUserArtboard, parseTextRuns, PENPOT_ROOT_FRAME_ID } from "./penpot-host.js";
+
+describe("isUserArtboard", () => {
+  it("skips the Penpot page root frame so mixed root size does not block export", () => {
+    expect(isUserArtboard({ id: PENPOT_ROOT_FRAME_ID, type: "frame" })).toBe(false);
+    expect(isUserArtboard({ id: "board-text", type: "board" })).toBe(true);
+    expect(isUserArtboard({ id: "shape-1", type: "rect" })).toBe(false);
+    expect(isUserArtboard({ id: PENPOT_ROOT_FRAME_ID, type: "board" })).toBe(false);
+  });
+});
 
 describe("parseTextRuns (T084)", () => {
   it("flattens nested content children into multiple runs", () => {

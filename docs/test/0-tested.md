@@ -32,8 +32,8 @@
 |---------|------|
 | QS-V1 | Penpot UI 三页下载未完成（栈已起，见 remote-acceptance） |
 | SC-003 | 位置误差 SKIP（本次未安装 LibreOffice） |
-| SC-005 | 四款办公软件本次远程均为 BLOCKED-ENV |
-| SC-008 | 试用未完成（无真实参与者） |
+| SC-005 | 豁免且未验证：本次远程四款 BLOCKED-ENV |
+| SC-008 | 豁免且未开展：无真实参与者 |
 
 ## 计划中的核心用例
 

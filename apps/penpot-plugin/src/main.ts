@@ -14,7 +14,7 @@ export interface PluginExportRequest {
 }
 
 export async function runBrowserExport(req: PluginExportRequest): Promise<{
-  buffer: Buffer;
+  buffer: Uint8Array;
   report: ReturnType<typeof preflight>;
 }> {
   if (req.signal?.aborted) {

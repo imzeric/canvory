@@ -15,7 +15,7 @@ export type PptxApp = {
   defineLayout: (layout: { name: string; width: number; height: number }) => void;
   layout: string;
   addSlide: () => PptxSlide;
-  write: (opts: { outputType: "nodebuffer" }) => Promise<Buffer>;
+  write: (opts: { outputType: "nodebuffer" | "uint8array" }) => Promise<Buffer | Uint8Array>;
 };
 
 export type PptxSlide = {
