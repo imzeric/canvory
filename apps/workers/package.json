@@ -1,0 +1,29 @@
+{
+  "name": "@canvory/workers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "test": "vitest run --passWithNoTests",
+    "start": "node dist/pptx.worker.js",
+    "start:dev": "tsx src/pptx.worker.ts"
+  },
+  "dependencies": {
+    "@canvory/core": "workspace:*",
+    "@canvory/document-model": "workspace:*",
+    "@canvory/exporter-pptx": "workspace:*",
+    "@canvory/shared": "workspace:*",
+    "bullmq": "^5.34.0",
+    "ioredis": "^5.4.2",
+    "minio": "^8.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

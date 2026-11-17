@@ -1,0 +1,30 @@
+{
+  "name": "@canvory/penpot-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@canvory/adapter-penpot": "workspace:*",
+    "@canvory/core": "workspace:*",
+    "@canvory/document-model": "workspace:*",
+    "@canvory/exporter-pptx": "workspace:*",
+    "@canvory/shared": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8"
+  }
+}

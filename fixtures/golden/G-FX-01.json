@@ -1,0 +1,89 @@
+{
+  "id": "g-fx-01",
+  "schemaVersion": "1.0.0",
+  "title": "G-FX-01",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "FX",
+      "type": "slide",
+      "children": [
+        {
+          "id": "p1",
+          "type": "path",
+          "transform": {
+            "x": 100,
+            "y": 100,
+            "width": 500,
+            "height": 400,
+            "rotation": 0
+          },
+          "points": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 40,
+              "y": 30
+            },
+            {
+              "x": 80,
+              "y": 60
+            },
+            {
+              "x": 120,
+              "y": 0
+            },
+            {
+              "x": 160,
+              "y": 30
+            },
+            {
+              "x": 200,
+              "y": 60
+            },
+            {
+              "x": 240,
+              "y": 0
+            },
+            {
+              "x": 280,
+              "y": 30
+            },
+            {
+              "x": 320,
+              "y": 60
+            },
+            {
+              "x": 360,
+              "y": 0
+            },
+            {
+              "x": 400,
+              "y": 30
+            },
+            {
+              "x": 440,
+              "y": 60
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

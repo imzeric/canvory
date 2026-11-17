@@ -21,10 +21,15 @@ temp/
 .env.*
 !.env.example
 
-# Dependencies & build (for future app code)
+# Dependencies & build
 node_modules/
 dist/
 build/
 .next/
 out/
 coverage/
+.turbo/
+*.tsbuildinfo
+
+# Package manager
+.pnpm-store/

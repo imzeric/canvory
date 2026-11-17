@@ -1,0 +1,111 @@
+{
+  "id": "g-skip-01",
+  "schemaVersion": "1.0.0",
+  "title": "G-SKIP-01",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "Skip",
+      "type": "slide",
+      "children": [
+        {
+          "id": "h1",
+          "type": "text",
+          "visible": false,
+          "transform": {
+            "x": 10,
+            "y": 10,
+            "width": 100,
+            "height": 40,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "hidden",
+                "fontFamily": "Arial",
+                "fontSize": 14,
+                "fontWeight": "400",
+                "color": "#000"
+              }
+            ]
+          }
+        },
+        {
+          "id": "e1",
+          "type": "text",
+          "transform": {
+            "x": 10,
+            "y": 60,
+            "width": 100,
+            "height": 40,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "   ",
+                "fontFamily": "Arial",
+                "fontSize": 14,
+                "fontWeight": "400",
+                "color": "#000"
+              }
+            ]
+          }
+        },
+        {
+          "id": "z1",
+          "type": "shape",
+          "shapeKind": "rect",
+          "transform": {
+            "x": 10,
+            "y": 120,
+            "width": 0,
+            "height": 50,
+            "rotation": 0
+          },
+          "fill": {
+            "type": "solid",
+            "color": "#f00"
+          }
+        },
+        {
+          "id": "ok",
+          "type": "text",
+          "transform": {
+            "x": 10,
+            "y": 200,
+            "width": 300,
+            "height": 40,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "visible",
+                "fontFamily": "Arial",
+                "fontSize": 18,
+                "fontWeight": "400",
+                "color": "#000"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

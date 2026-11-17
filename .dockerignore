@@ -1,0 +1,17 @@
+node_modules
+.git
+.turbo
+dist
+build
+coverage
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+specs
+docs
+.cursor
+.specify/memory
+*.md
+!infrastructure/docker/README-penpot.md

@@ -1,0 +1,32 @@
+{
+  "G-TEXT-01": {
+    "expect": "L0/L1 native text"
+  },
+  "G-TEXT-02": {
+    "expect": "multi-run styles"
+  },
+  "G-SHAPE-01": {
+    "expect": "rect/ellipse native"
+  },
+  "G-SHAPE-02": {
+    "expect": "line/path approx or L2"
+  },
+  "G-IMG-01": {
+    "expect": "image object"
+  },
+  "G-GROUP-01": {
+    "expect": "group expand order"
+  },
+  "G-NOTES-01": {
+    "expect": "pptx notes"
+  },
+  "G-FX-01": {
+    "expect": "L2 path complex"
+  },
+  "G-SKIP-01": {
+    "expect": "L3 skip hidden/empty/zero"
+  },
+  "G-NEG-SIZE": {
+    "expect": "SIZE_MISMATCH block"
+  }
+}

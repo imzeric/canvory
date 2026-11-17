@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: canvory
+      POSTGRES_PASSWORD: canvory
+      POSTGRES_DB: canvory
+    ports:
+      - "5432:5432"
+    volumes:
+      - canvory_pg:/var/lib/postgresql/data
+      - ./init-penpot-db.sql:/docker-entrypoint-initdb.d/init-penpot-db.sql:ro
+    networks:
+      - canvory_net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - canvory_net
+
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: canvory
+      MINIO_ROOT_PASSWORD: canvorysecret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - canvory_minio:/data
+    networks:
+      - canvory_net
+
+  # server / worker：本地开发用 pnpm；生产镜像后续接入
+  # Penpot overlay：docker compose -f docker-compose.yml -f docker-compose.penpot.yml up -d
+
+volumes:
+  canvory_pg:
+  canvory_minio:
+
+networks:
+  canvory_net:
+    driver: bridge
+

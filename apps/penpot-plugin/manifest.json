@@ -1,0 +1,7 @@
+{
+  "name": "Canvory PPTX Export",
+  "description": "从 Penpot 画板导出可编辑 PPTX（Canvory Phase 1）",
+  "code": "/plugin.js",
+  "icon": "/icon.png",
+  "permissions": ["content:read", "content:write"]
+}

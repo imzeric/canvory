@@ -1,0 +1,50 @@
+{
+  "id": "g-text-01",
+  "schemaVersion": "1.0.0",
+  "title": "G-TEXT-01",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "Page 1",
+      "type": "slide",
+      "children": [
+        {
+          "id": "t1",
+          "type": "text",
+          "transform": {
+            "x": 100,
+            "y": 100,
+            "width": 600,
+            "height": 80,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "Hello Canvory",
+                "fontFamily": "Arial",
+                "fontSize": 36,
+                "fontWeight": "700",
+                "color": "#111111"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

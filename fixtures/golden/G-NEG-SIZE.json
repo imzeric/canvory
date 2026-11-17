@@ -1,0 +1,83 @@
+{
+  "id": "g-neg-size",
+  "schemaVersion": "1.0.0",
+  "title": "G-NEG-SIZE",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "A",
+      "type": "slide",
+      "children": [
+        {
+          "id": "t1",
+          "type": "text",
+          "transform": {
+            "x": 10,
+            "y": 10,
+            "width": 100,
+            "height": 40,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "A",
+                "fontFamily": "Arial",
+                "fontSize": 18,
+                "fontWeight": "400",
+                "color": "#000"
+              }
+            ]
+          }
+        }
+      ],
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "s2",
+      "name": "B",
+      "type": "slide",
+      "children": [
+        {
+          "id": "t2",
+          "type": "text",
+          "transform": {
+            "x": 10,
+            "y": 10,
+            "width": 100,
+            "height": 40,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "B",
+                "fontFamily": "Arial",
+                "fontSize": 18,
+                "fontWeight": "400",
+                "color": "#000"
+              }
+            ]
+          }
+        }
+      ],
+      "width": 1280,
+      "height": 720
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

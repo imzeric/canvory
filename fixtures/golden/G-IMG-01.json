@@ -1,0 +1,49 @@
+{
+  "id": "g-img-01",
+  "schemaVersion": "1.0.0",
+  "title": "G-IMG-01",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "Image",
+      "type": "slide",
+      "children": [
+        {
+          "id": "i1",
+          "type": "image",
+          "transform": {
+            "x": 200,
+            "y": 150,
+            "width": 400,
+            "height": 300,
+            "rotation": 0
+          },
+          "assetId": "a1"
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "a1",
+      "type": "image",
+      "mimeType": "image/png",
+      "dataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "width": 1,
+      "height": 1
+    }
+  ],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

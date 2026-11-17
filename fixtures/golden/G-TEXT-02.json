@@ -1,0 +1,66 @@
+{
+  "id": "g-text-02",
+  "schemaVersion": "1.0.0",
+  "title": "G-TEXT-02",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "Rich",
+      "type": "slide",
+      "children": [
+        {
+          "id": "t1",
+          "type": "text",
+          "transform": {
+            "x": 80,
+            "y": 80,
+            "width": 900,
+            "height": 120,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "Bold ",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "fontWeight": "700",
+                "color": "#000000"
+              },
+              {
+                "text": "Italic ",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "fontWeight": "400",
+                "italic": true,
+                "color": "#333333"
+              },
+              {
+                "text": "Underline",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "fontWeight": "400",
+                "underline": true,
+                "color": "#0044aa"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

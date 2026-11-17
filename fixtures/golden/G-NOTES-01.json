@@ -1,0 +1,51 @@
+{
+  "id": "g-notes-01",
+  "schemaVersion": "1.0.0",
+  "title": "G-NOTES-01",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "Notes",
+      "type": "slide",
+      "children": [
+        {
+          "id": "t1",
+          "type": "text",
+          "transform": {
+            "x": 100,
+            "y": 100,
+            "width": 500,
+            "height": 80,
+            "rotation": 0
+          },
+          "content": {
+            "runs": [
+              {
+                "text": "Slide with notes",
+                "fontFamily": "Arial",
+                "fontSize": 32,
+                "fontWeight": "400",
+                "color": "#111"
+              }
+            ]
+          }
+        }
+      ],
+      "notes": "演讲者备注：请强调产品价值。"
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

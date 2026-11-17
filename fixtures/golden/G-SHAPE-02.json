@@ -1,0 +1,73 @@
+{
+  "id": "g-shape-02",
+  "schemaVersion": "1.0.0",
+  "title": "G-SHAPE-02",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "LinePath",
+      "type": "slide",
+      "children": [
+        {
+          "id": "l1",
+          "type": "shape",
+          "shapeKind": "line",
+          "transform": {
+            "x": 100,
+            "y": 200,
+            "width": 400,
+            "height": 0,
+            "rotation": 0
+          },
+          "stroke": {
+            "color": "#000000",
+            "width": 2
+          }
+        },
+        {
+          "id": "p1",
+          "type": "path",
+          "transform": {
+            "x": 100,
+            "y": 300,
+            "width": 400,
+            "height": 200,
+            "rotation": 0
+          },
+          "points": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 100,
+              "y": 50
+            },
+            {
+              "x": 200,
+              "y": 20
+            },
+            {
+              "x": 300,
+              "y": 80
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

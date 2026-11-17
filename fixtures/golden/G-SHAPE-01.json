@@ -1,0 +1,61 @@
+{
+  "id": "g-shape-01",
+  "schemaVersion": "1.0.0",
+  "title": "G-SHAPE-01",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "Shapes",
+      "type": "slide",
+      "children": [
+        {
+          "id": "r1",
+          "type": "shape",
+          "shapeKind": "rect",
+          "transform": {
+            "x": 100,
+            "y": 100,
+            "width": 300,
+            "height": 180,
+            "rotation": 0
+          },
+          "fill": {
+            "type": "solid",
+            "color": "#4A90D9"
+          },
+          "radius": 12
+        },
+        {
+          "id": "e1",
+          "type": "shape",
+          "shapeKind": "ellipse",
+          "transform": {
+            "x": 480,
+            "y": 100,
+            "width": 220,
+            "height": 180,
+            "rotation": 0
+          },
+          "fill": {
+            "type": "solid",
+            "color": "#E67E22"
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}

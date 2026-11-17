@@ -1,0 +1,79 @@
+{
+  "id": "g-group-01",
+  "schemaVersion": "1.0.0",
+  "title": "G-GROUP-01",
+  "type": "presentation",
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "unit": "px"
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "name": "Group",
+      "type": "slide",
+      "children": [
+        {
+          "id": "g1",
+          "type": "group",
+          "transform": {
+            "x": 50,
+            "y": 50,
+            "width": 800,
+            "height": 400,
+            "rotation": 0
+          },
+          "children": [
+            {
+              "id": "r1",
+              "type": "shape",
+              "shapeKind": "rect",
+              "transform": {
+                "x": 50,
+                "y": 50,
+                "width": 200,
+                "height": 120,
+                "rotation": 0
+              },
+              "fill": {
+                "type": "solid",
+                "color": "#2ecc71"
+              }
+            },
+            {
+              "id": "t1",
+              "type": "text",
+              "transform": {
+                "x": 80,
+                "y": 200,
+                "width": 300,
+                "height": 60,
+                "rotation": 0
+              },
+              "content": {
+                "runs": [
+                  {
+                    "text": "In group",
+                    "fontFamily": "Arial",
+                    "fontSize": 24,
+                    "fontWeight": "400",
+                    "color": "#000"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "animations": [],
+  "interactions": [],
+  "metadata": {
+    "createdAt": 1700000000000,
+    "updatedAt": 1700000000000,
+    "version": 1
+  }
+}
