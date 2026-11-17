@@ -128,3 +128,7 @@ CDM → 可交付演示文稿文件。
 - 冲刺门禁 → `2-ready-to-go.md`。  
 - 可执行任务 → `docs/shipping/0-to-dos.md`（唯一任务清单）。  
 - 正式需求基线 → `specs/001-pptx-phase1/spec.md`。
+
+## 9. 待审设计（未实施）
+
+网页 AI PPT 工作室的设计规格在 `docs/superpowers/specs/2026-11-17-web-ppt-studio-design.md`。产品事实在根目录 `PRODUCT.md`，视觉种子在 `DESIGN.md`。这三份只供审核，不是第一阶段已交付范围，也没有实施计划。
