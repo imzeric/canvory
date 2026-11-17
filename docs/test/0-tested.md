@@ -25,12 +25,13 @@
 | QS-V8 | 架构验收 A/B | S0 | 2026-11-17 | 通过 | 同上 + artifacts |
 | QS-V9 | SC-004 单页耗时 | S0 | 2026-11-17 | 通过 | 同上 |
 | RM-03 | Postgres/Redis/MinIO 非内存联调 | S1 | 2026-11-17 | 通过 | [rm03-infra.md](./2-test-report/rm03-infra.md) |
+| RM-01 | Penpot 宿主三页前台下载 | S1 | 2026-11-17 | 通过 | [remote-acceptance-7484.md](./2-test-report/remote-acceptance-7484.md) |
 
 ## SKIP / 待实机
 
 | 用例 ID | 说明 |
 |---------|------|
-| QS-V1 | Penpot UI 三页下载未完成（栈已起，见 remote-acceptance） |
+| QS-V1 | quickstart 脚本不打开浏览器，仍 SKIP。浏览器实机见 RM-01 |
 | SC-003 | 位置误差 SKIP（本次未安装 LibreOffice） |
 | SC-005 | 豁免且未验证：本次远程四款 BLOCKED-ENV |
 | SC-008 | 豁免且未开展：无真实参与者 |

@@ -10,7 +10,7 @@
 | 跨软件兼容（SC-005） | `compat-matrix.md` | **豁免**。历史 BLOCKED-ENV 保留，不是 PASS |
 | 文档版本恢复 | `rm03-infra.md`（新进程读到 v1/v2/v3） | 实机 ✓ |
 | 后台导出任务 | `rm03-infra.md`（BullMQ 成功可下、取消 404、MinIO 对象） | 实机 ✓ |
-| Penpot 宿主前台导出下载 | 本次浏览器：插件显示「宿主: Penpot」，三块 1920×1080 画板可预检；下载到 3 页 PPTX，页内没有文本/矩形/图片字节 | **未完成** |
+| Penpot 宿主前台导出下载 | `remote-acceptance-7484.md` 内容闭环：宿主 Penpot，三块 1920×1080 画板的子图层经 findShapes 核对；下载的 3 页含 `IT7484-PENPOT-TEXT`、填充 `3366CC` 的形状、`ppt/media/image-3-1.png` 且被 slide3 rel 引用。更早一次空内容下载不算通过 | 实机 ✓ |
 
 ## 相关成功标准交叉引用
 

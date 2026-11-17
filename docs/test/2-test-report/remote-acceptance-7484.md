@@ -16,10 +16,10 @@
 | SC-003 | SKIP | `pnpm validate:sc003` | 0 | 无 soffice。未安装 LibreOffice。这不是 SC-005 通过 |
 | PPTX ZIP 冒烟 | PASS | `pnpm validate:pptx-smoke` | 0 | 只证明 OOXML ZIP。不能代替办公软件打开 |
 | RM-03 鉴权/版本/队列/对象存储 | PASS | `pnpm validate:rm03` | 0 | `USE_MEMORY_DB=0`，`EXPORT_INLINE=0`。细节见 `rm03-infra.md` |
-| RM-01 Penpot 实机导出 | BLOCKED | 见下 | — | 服务起来了，三页下载没有完成 |
+| RM-01 Penpot 实机导出 | PASS | 浏览器下载后解包 | 0 | 见文末「内容闭环」。宿主为 Penpot，三页分别含文本、矩形、被 slide rel 引用的图片 |
 | SC-005 四款软件 | BLOCKED-ENV | `command -v` / `dpkg -l` | — | PowerPoint、WPS、Keynote、LibreOffice 都不在这台机器上。T087 未勾 |
 | SC-008 五人试用 | BLOCKED | 查 `sc008-usability.md` | — | 没有真实参与者记录。脚本在 `sc008-trial-script.md`。未发邀请 |
-| SC-009 | 未成立 | — | — | SC-005/SC-008 已豁免。Penpot 下载到的 3 页 PPTX 没有文本、矩形、图片内容 |
+| SC-009 | 所列四项有证据 | — | — | 映射+预检、Penpot 前台下载、版本恢复、后台任务都有记录。SC-003 仍 SKIP，SC-005/SC-008 仍是豁免，都不记通过 |
 
 ## RM-03 覆盖
 
@@ -57,8 +57,34 @@
 - 浏览器导出不再报 `nodebuffer is not supported`。修复是：有 DOM 时 `pptxgenjs` 用 `uint8array`。
 - 页面根画板 `00000000-0000-0000-0000-000000000000` 不再被当成一页，避免和 1920×1080 的用户画板一起触发 `SIZE_MISMATCH`。
 - Penpot 的图片是 `rectangle` + `fillImage`，现已按图片导出。
-- 实际下载的 `New File 8.pptx` 有 3 页，但三页里没有 `IT7484-PENPOT-TEXT`，没有图片部件，也没有矩形形状。画出来的图片落在画板外面，文本和矩形没有成为这三块画板的子图层。所以不能把这次下载记成内容闭环通过。
+- 更早一次下载的 `New File 8.pptx` 有 3 页，但三页里没有 `IT7484-PENPOT-TEXT`，没有图片部件，也没有矩形形状。当时元素没有成为三块画板的子图层。那一次不能记成内容闭环通过。
+
+## 内容闭环（同一远程浏览器，重新造样例之后）
+
+样例用 Penpot 2.4.3 官方插件 API（`content:write`，安装时点了 ALLOW）在空文件里创建，并在重新打开文件后用 `currentPage.findShapes` 核对归属。没有往 PPTX 里注入成品。
+
+重新打开后的图层树：
+
+| 形状 | 父图层 | 几何 |
+|------|--------|------|
+| 画板「文本」 | Root Frame | 1920×1080 |
+| 文本 `IT7484-PENPOT-TEXT`，字符同名 | 文本 | x=120 y=100，880×140 |
+| 画板「矩形」 | Root Frame | 1920×1080 |
+| 矩形 `IT7484-RECT`，填充 `#3366cc` | 矩形 | x=160 y=180，480×280 |
+| 画板「图片」 | Root Frame | 1920×1080 |
+| 矩形 `IT7484-IMAGE`，`fillImage=true` | 图片 | x=160 y=180，320×240 |
+
+Canvory 插件面板为「宿主: Penpot」，画板是「文本 / 矩形 / 图片」，模式 auto，未勾后台导出。预检后前台导出，浏览器下载 `New File 11.pptx`（56720 字节）。解包：
+
+- 3 页：`ppt/slides/slide1.xml` … `slide3.xml`
+- slide1 文本节点 `<a:t>IT7484-PENPOT-TEXT</a:t>`
+- slide2 形状填充 `srgbClr val="3366CC"`
+- slide3 有 `r:embed="rId1"`，`slide3.xml.rels` 的 Relationship 类型是 image，Target 为 `../media/image-3-1.png`（1961 字节，PNG 文件头）
+
+第一次能下到三页但没有图片，是因为插件在 Penpot SES 隔间里调用未绑定的 `btoa`，异常被吞掉，图片 data URL 为空，导出器就跳过了这一页的图片。现改为按字节手写 base64，并用带下标的普通对象做回归（`bytesToDataUrl` / `dataUrlFromExportBytes`）。修复后的这次下载才算内容闭环。
+
+本轮门禁（修复之后）：`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm validate:quickstart`、`pnpm validate:sc-rates`、`pnpm validate:sc003`、`pnpm validate:pptx-smoke`、`pnpm validate:rm03` 退出码都是 0。插件测试 4 项。quickstart 仍是 PASS 8 / FAIL 0 / SKIP 1（V1 脚本本身不打开浏览器）。SC-001 5/5，SC-002 3/3。SC-003 SKIP。RM-03 PASS。
 
 ## 仍开放
 
-RM-01（三页内容要进 PPTX）、SC-009。SC-003 维持 SKIP。SC-005 / T087 / SC-008 是豁免后的后续项，不是本阶段阻断。
+SC-003 维持 SKIP，不记通过。SC-005 / T087 / SC-008 是豁免后的后续项，不是本阶段阻断，也不记通过。quickstart 脚本里的 V1 仍是 SKIP。
