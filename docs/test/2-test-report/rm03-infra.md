@@ -16,10 +16,10 @@
 | server 健康检查 | PASS | GET /api/health on :3011 |
 | 未认证拒绝且不返回文档体 | PASS | status 401 |
 | 错误令牌 401 | PASS | status 401 |
-| 资源预签名 | PASS | status 201 key uploads/c3faca81-8a0e-4967-9bd0-6736dbcf89ad/it7484.png |
+| 资源预签名 | PASS | status 201 key uploads/096db8ae-956a-4bf9-a602-cd667bd97041/it7484.png |
 | 资源上传 | PASS | status 201 |
-| MinIO 对象存在（非内存） | PASS | uploads/c3faca81-8a0e-4967-9bd0-6736dbcf89ad/it7484.png |
-| 创建文档 | PASS | id 930fbc3f-bebe-4b0b-99dd-1986e9841034 |
+| MinIO 对象存在（非内存） | PASS | uploads/096db8ae-956a-4bf9-a602-cd667bd97041/it7484.png |
+| 创建文档 | PASS | id fcb125e7-d3a2-49ce-9f0e-840ca3856f93 |
 | 版本 1 已写入 Postgres | PASS | text=IT7484-V1-TEXT |
 | 保存版本 2 | PASS | version 2 |
 | 恢复 v1 产生新版本 | PASS | version 3 |
@@ -28,7 +28,7 @@
 | 取消排队任务 | PASS | status cancelled |
 | 取消后不可下载 | PASS | status 404 |
 | Worker 不把已取消任务写成可下载 | PASS | status cancelled object=false |
-| 成功路径再次入队 | PASS | task b11bc515-9a44-474e-94dd-9244406435f6 |
+| 成功路径再次入队 | PASS | task d33dc90f-bca2-4df2-8927-93e6eadac387 |
 | 导出任务成功 | PASS | succeeded |
 | 成功任务可下载 | PASS | status 200 bytes 46079 |
 | PPTX 含恢复后的 v1 文本与 MinIO 图片 | PASS | {"MISSING":"","MEDIA":"ppt/media/,ppt/media/image-1-1.png","SLIDE_HAS_V1":"True","SLIDE_HAS_V2":"False","MEDIA_HAS_PNG":"False","MEDIA_CONTAINS_PNG":"True","NAMES":"40"} |

@@ -6,9 +6,9 @@
 |----|------|------|--------|------|
 | lint | PASS | `pnpm lint` | 0 | 10 个包，`--max-warnings 0`。空接口改为类型别名；删掉未生效的 `eslint-disable` |
 | typecheck | PASS | `pnpm typecheck` | 0 | 16/16 |
-| 单元/集成测试 | PASS | `pnpm test` | 0 | 当时 core 3、server 9、document-model 2、plugin 2。插件改动后重跑 plugin：2/2，退出码 0 |
+| 单元/集成测试 | PASS | `pnpm test` | 0 | 最终复验 21 项：core 3、document-model 2、plugin 4、exporter 3、server 9 |
 | build | PASS | `pnpm build` | 0 | 10/10。插件二次构建产出单个 `plugin.js` |
-| quickstart V1 | SKIP | `pnpm validate:quickstart` | 0 | 汇总 PASS 8 / FAIL 0 / SKIP 1。V1 仍是 Penpot UI |
+| quickstart 脚本 V1 | SKIP | `pnpm validate:quickstart` | 0 | 汇总仍是 PASS 8 / FAIL 0 / SKIP 1。脚本不打开浏览器，不把这一行改成 PASS |
 | quickstart V2–V5、V8–V9 | PASS | 同上 | 0 | 脚本内断言。V9 是单页 CLI 2ms |
 | quickstart V6/V7 | PASS（脚本级） | 同上 | 0 | 只检查常量和恢复语义说明。跨进程版本与 BullMQ 以 RM-03 为准 |
 | SC-001 | PASS | `pnpm validate:sc-rates` | 0 | 5/5 = 100% |
@@ -16,30 +16,26 @@
 | SC-003 | SKIP | `pnpm validate:sc003` | 0 | 无 soffice。未安装 LibreOffice。这不是 SC-005 通过 |
 | PPTX ZIP 冒烟 | PASS | `pnpm validate:pptx-smoke` | 0 | 只证明 OOXML ZIP。不能代替办公软件打开 |
 | RM-03 鉴权/版本/队列/对象存储 | PASS | `pnpm validate:rm03` | 0 | `USE_MEMORY_DB=0`，`EXPORT_INLINE=0`。细节见 `rm03-infra.md` |
-| RM-01 Penpot 实机导出 | PASS | 浏览器下载后解包 | 0 | 见文末「内容闭环」。宿主为 Penpot，三页分别含文本、矩形、被 slide rel 引用的图片 |
-| SC-005 四款软件 | BLOCKED-ENV | `command -v` / `dpkg -l` | — | PowerPoint、WPS、Keynote、LibreOffice 都不在这台机器上。T087 未勾 |
-| SC-008 五人试用 | BLOCKED | 查 `sc008-usability.md` | — | 没有真实参与者记录。脚本在 `sc008-trial-script.md`。未发邀请 |
+| Penpot 浏览器 UI（与脚本 V1 分开） | PASS | 宿主 findShapes + 浏览器下载后解包 | 0 | 见文末「内容闭环」。不是 quickstart 脚本计数 |
+| SC-005 四款软件 | 豁免，不是 PASS | `command -v` / `dpkg -l` | — | 历史结果仍是 BLOCKED-ENV。用户豁免后不是当前阻断。T087 不勾 |
+| SC-008 五人试用 | 豁免，不是 PASS | 查 `sc008-usability.md` | — | 样本仍为 0。用户豁免后不是当前阻断。脚本在 `sc008-trial-script.md` |
 | SC-009 | 所列四项有证据 | — | — | 映射+预检、Penpot 前台下载、版本恢复、后台任务都有记录。SC-003 仍 SKIP，SC-005/SC-008 仍是豁免，都不记通过 |
 
 ## RM-03 覆盖
 
 已核对：未认证 401 且响应体不含文档标记；错误令牌 401；版本 1/2 与 restore 出的版本 3 写入 Postgres；停掉 server 再拉起后仍读到 v1 文本和三个版本号；任务 `transport=bullmq`；取消后 artifact 404，Worker 启动后仍为 cancelled 且 MinIO 没有该 pptx；成功任务 HTTP 200、ZIP 内含 v1 文本和上传的 PNG；对象大小与下载字节一致；`export_jobs` 行分别为 succeeded / cancelled。测试文档和对象桶 `canvory-it-7484` 在结束时删除。
 
-## RM-01 做到哪一步
+## 历史：第一次浏览器尝试没有完成下载
+
+下面是当时的记录，保留下来，不再当作当前阻塞。当前结论是文末的内容闭环。
 
 - `http://127.0.0.1:9002/` 返回 200。`/js/config.js` 含 `enable-feature-plugins`。backend 日志有 `welcome to penpot` 2.4.3，flags 含 `feature-plugins`、`registration`、`login-with-password`。
 - 插件站 `http://127.0.0.1:4400/manifest.json`、`plugin.js`、`index.html` 均为 200。
-- 整份 `docker compose up` 会因 Docker Hub 拒绝 `minio/minio` 而失败。本次只启动了 postgres、redis、penpot-frontend、penpot-backend、penpot-exporter。
+- 整份 `docker compose up` 会因 Docker Hub 拒绝 `minio/minio` 而失败。当时只启动了 postgres、redis、penpot-frontend、penpot-backend、penpot-exporter。
 - 浏览器里注册了本地账号并打开过设计文件。第二次尝试里 Ctrl+Alt+P 打开了插件管理器，安装对话框的权限与本仓库 manifest 一致。之后看到的面板文案（「配置 / 运行环境」）不在本仓库 UI 源码里，不能当作「宿主: Penpot」的证据。
-- `/home/ubuntu` 与 `/tmp` 没有新的 pptx。三页（文本、矩形、图片）导出下载没有完成。
-- 因此 V1 保持 SKIP，不把健康检查或 Demo 回退写成实机通过。
+- 那一次 `/tmp` 里还没有含目标内容的 pptx，三页下载没有完成。健康检查和 Demo 回退不能记成实机通过。
 
-本地复现入口（需在编辑器里自己点完导出）：
-
-1. 打开 `http://127.0.0.1:9002/`
-2. 进入设计文件，Ctrl+Alt+P，安装 `http://127.0.0.1:4400/manifest.json`
-3. 做三个同尺寸画板（文本、矩形、图片），范围全部、模式 auto、不要勾后台导出，点「导出」
-4. 只有界面写着「宿主: Penpot」并且下载到 pptx，才能把 V1 改成 PASS
+quickstart 脚本里的 V1 到现在仍是 SKIP，因为脚本不打开浏览器。这一行不因后来的浏览器下载改成 PASS，自动化汇总保持 PASS 8 / FAIL 0 / SKIP 1。浏览器实机另记，见「内容闭环」。
 
 ## 2026-11-17 豁免
 
@@ -83,8 +79,15 @@ Canvory 插件面板为「宿主: Penpot」，画板是「文本 / 矩形 / 图�
 
 第一次能下到三页但没有图片，是因为插件在 Penpot SES 隔间里调用未绑定的 `btoa`，异常被吞掉，图片 data URL 为空，导出器就跳过了这一页的图片。现改为按字节手写 base64，并用带下标的普通对象做回归（`bytesToDataUrl` / `dataUrlFromExportBytes`）。修复后的这次下载才算内容闭环。
 
-本轮门禁（修复之后）：`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm validate:quickstart`、`pnpm validate:sc-rates`、`pnpm validate:sc003`、`pnpm validate:pptx-smoke`、`pnpm validate:rm03` 退出码都是 0。插件测试 4 项。quickstart 仍是 PASS 8 / FAIL 0 / SKIP 1（V1 脚本本身不打开浏览器）。SC-001 5/5，SC-002 3/3。SC-003 SKIP。RM-03 PASS。
+最终复验（2026-11-17，文档收口前再跑一遍）：`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm validate:quickstart`、`pnpm validate:sc-rates`、`pnpm validate:sc003`、`pnpm validate:pptx-smoke`、`pnpm validate:rm03` 退出码都是 0。测试 21 项（core 3、document-model 2、plugin 4、exporter 3、server 9）。quickstart 仍是 PASS 8 / FAIL 0 / SKIP 1。SC-001 5/5，SC-002 3/3。SC-003 SKIP。RM-03 PASS。
 
-## 仍开放
+## 当前判定和剩余限制
 
-SC-003 维持 SKIP，不记通过。SC-005 / T087 / SC-008 是豁免后的后续项，不是本阶段阻断，也不记通过。quickstart 脚本里的 V1 仍是 SKIP。
+SC-009 的有效必需项是：完整元素映射与预检、Penpot 宿主前台导出并下载、文档版本恢复、后台导出任务。这四项都有上面的证据，先前失败的下载只作历史。
+
+这些没有验证，不能写成通过：
+
+- SC-003 位置误差仍是 SKIP。没有 LibreOffice，阈值仍是页宽 0.5%，没有测量中心点。
+- SC-005 / T087 / RM-02 四款办公软件是用户豁免。历史 BLOCKED-ENV 保留，没有打开 PowerPoint、WPS、Keynote 或 LibreOffice。
+- SC-008 五人试用是用户豁免。样本仍是 0。
+- quickstart 脚本 V1 仍是 SKIP。它和上面的浏览器 UI PASS 是两件事。

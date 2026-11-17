@@ -187,7 +187,7 @@ Monorepo（见 plan.md）：`apps/`、`packages/`、`fixtures/`、`infrastructur
 
 - [X] T057 [P] 补齐 `fixtures/golden/README.md` 覆盖表中全部 G-* 样例文件与期望报告摘要
 - [X] T058 实现/记录 SC-001–003 于 `fixtures/golden/metrics.md`：含 LibreOffice 无头渲染命令、锚点抽样、分母分子；SC-004 计时规程（点击→可下载，墙钟/performance.now）与不达标记缺陷模板
-- [X] T059 执行 `specs/001-pptx-phase1/quickstart.md` V1–V9（含 ≤20 页 30s 计时），结果写入 `docs/test/0-tested.md` 与 `docs/test/2-test-report/`
+- [X] T059 执行 `specs/001-pptx-phase1/quickstart.md` V1–V9（含 ≤20 页 30s 计时），结果写入 `docs/test/0-tested.md` 与 `docs/test/2-test-report/`。脚本汇总保持 PASS 8 / FAIL 0 / SKIP 1：V1 不打开浏览器，仍 SKIP。独立的 Penpot 浏览器下载记在 `remote-acceptance-7484.md`，不回写这条自动化计数。
 - [X] T060 [P] 跨软件兼容矩阵（PowerPoint/WPS/Keynote/LibreOffice）记录于 `docs/test/2-test-report/`
 - [X] T061 同步 `docs/shipping/0-to-dos.md` / `1-doing.md` / `2-done.md` 与本任务进度
 - [X] T062 [P] 更新 `docs/plan/1-confirmed.md`：纳入 FR-016、恢复语义、后台提示规则、Penpot 部署与 Asset 管道等决策
