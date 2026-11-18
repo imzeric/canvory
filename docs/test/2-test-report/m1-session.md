@@ -11,17 +11,17 @@
 - `pnpm test`
 - `pnpm build`
 
-`pnpm test` 里有断言的用例 38 个：
+`pnpm test` 里有断言的用例 41 个：
 
 | 包 | 通过 |
 | --- | ---: |
 | `@canvory/document-model` | 4 |
-| `@canvory/core` | 9 |
+| `@canvory/core` | 10 |
 | `@canvory/exporter-pptx` | 3 |
 | `@canvory/server` | 9 |
-| `@canvory/penpot-plugin` | 13 |
+| `@canvory/penpot-plugin` | 15 |
 
-没有测试文件的包以 `--passWithNoTests` 退出码 0，不计入 38。
+没有测试文件的包以 `--passWithNoTests` 退出码 0，不计入 41。
 
 插件用例覆盖：1.0.0 仍可解析且缺省 `outline`/`charts` 为 `[]`；1.1.0 接受章节和图表字段；换文件不带走挂载和资料；未挂载、锁定、文件 id、页 id 或修订号不一致时 `allowWrite` 为 false；非用户画板（含页面根）不能写入挂载；选区变化不改挂载名单；「绘制」保持禁用。
 
@@ -33,7 +33,9 @@ Penpot 2.4.3 官方 `plugin-modal`。插件由 `penpot.ui.open` 打开，界面�
 
 立即重载、赶在宿主把 `pluginData` 写入文件之前，可能读不到刚挂上的名单。这次通过的证据是等待约 8 秒后的重开，以及随后新浏览器上下文里的读回。
 
-会话存在当前文件的 `pluginData` 键 `canvory.mounts`。值是完整 `FileSession`（文件 id、页 id、修订号、挂载、资料 id），不只是 id 数组。
+会话存在当前文件的 `pluginData` 键 `canvory.mounts`。值是完整 `FileSession`（文件 id、页 id、修订号、挂载、资料 id），不只是 id 数组。非法修订号（负数、小数、`NaN`）会被拒绝。
+
+`finish` 把 `acceptingWrites` 设为 false 并增加 `writeEpoch`。旧消息带旧 epoch，或在文件再次 `filechange` 之前发来，挂载和 `assistant:write` 都返回失败，也不改 `pluginData`。自动化用带 `getPluginData`/`setPluginData` 的假文件对象验证了往返。`assistant:write` 即使通过闸门也不调用形状 API。逐画板手改修订仍未实现，因此当前没有图层写入路径。
 
 ## 还没有做
 

@@ -9,7 +9,13 @@ function isMount(value: unknown): value is MountRecord {
 export function parseFileSession(input: unknown): FileSession {
   if (!input || typeof input !== "object") throw new Error("FILE_SESSION_INVALID");
   const row = input as FileSession;
-  if (typeof row.fileId !== "string" || typeof row.pageId !== "string" || typeof row.revision !== "number") {
+  if (
+    typeof row.fileId !== "string" ||
+    typeof row.pageId !== "string" ||
+    typeof row.revision !== "number" ||
+    !Number.isInteger(row.revision) ||
+    row.revision < 0
+  ) {
     throw new Error("FILE_SESSION_INVALID");
   }
   if (!Array.isArray(row.mounts) || !row.mounts.every(isMount)) throw new Error("FILE_SESSION_INVALID");

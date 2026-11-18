@@ -111,20 +111,24 @@ export function App() {
           selectionIds={assistant?.selectionIds ?? []}
           mounts={assistant?.session.mounts ?? []}
           persistence={assistant?.persistence ?? "unavailable"}
+          canWrite={assistant?.acceptingWrites === true}
           onMount={(id) => {
             const fileId = assistant?.session.fileId;
-            if (!fileId) return;
-            enqueueSession(() => mountAssistant(id, fileId));
+            const writeEpoch = assistant?.writeEpoch;
+            if (!fileId || assistant?.acceptingWrites !== true || writeEpoch === undefined) return;
+            enqueueSession(() => mountAssistant(id, fileId, writeEpoch));
           }}
           onRemove={(id) => {
             const fileId = assistant?.session.fileId;
-            if (!fileId) return;
-            enqueueSession(() => removeAssistantMount(id, fileId));
+            const writeEpoch = assistant?.writeEpoch;
+            if (!fileId || assistant?.acceptingWrites !== true || writeEpoch === undefined) return;
+            enqueueSession(() => removeAssistantMount(id, fileId, writeEpoch));
           }}
           onLock={(id, locked) => {
             const fileId = assistant?.session.fileId;
-            if (!fileId) return;
-            enqueueSession(() => lockAssistantMount(id, fileId, locked));
+            const writeEpoch = assistant?.writeEpoch;
+            if (!fileId || assistant?.acceptingWrites !== true || writeEpoch === undefined) return;
+            enqueueSession(() => lockAssistantMount(id, fileId, locked, writeEpoch));
           }}
         />
       ) : tab === "export" ? (

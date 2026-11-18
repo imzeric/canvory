@@ -16,6 +16,18 @@ describe("sessionForFile", () => {
     expect(next.fileId).toBe("file-b");
   });
 
+  it("rejects a revision that is not a nonnegative integer", () => {
+    const base = {
+      fileId: "file-a",
+      pageId: "page-a",
+      mounts: [],
+      materialIds: [],
+    };
+    expect(() => parseFileSession({ ...base, revision: -1 })).toThrow("FILE_SESSION_INVALID");
+    expect(() => parseFileSession({ ...base, revision: 1.5 })).toThrow("FILE_SESSION_INVALID");
+    expect(() => parseFileSession({ ...base, revision: Number.NaN })).toThrow("FILE_SESSION_INVALID");
+  });
+
   it("bumps the revision when a mount is added, removed, or locked", () => {
     const stored = parseFileSession({
       fileId: "file-a",

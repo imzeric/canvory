@@ -9,6 +9,7 @@ export function AssistantPanel(props: {
   onRemove: (id: string) => void;
   onLock: (id: string, locked: boolean) => void;
   persistence: "file" | "unavailable";
+  canWrite: boolean;
 }) {
   return (
     <section
@@ -37,9 +38,10 @@ export function AssistantPanel(props: {
       </ul>
       <p data-testid="selection-list">{props.selectionIds.join(",")}</p>
       {props.persistence === "unavailable" ? <p>当前不在 Penpot 文件中，挂载不会写入文件。</p> : null}
+      {props.persistence === "file" && !props.canWrite ? <p>当前文件会话已结束，不能写入。</p> : null}
       <button
         type="button"
-        disabled={props.selectionIds.length === 0}
+        disabled={!props.canWrite || props.selectionIds.length === 0}
         onClick={() => {
           for (const id of props.selectionIds) props.onMount(id);
         }}

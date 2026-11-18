@@ -15,6 +15,7 @@ function Harness() {
         selectionIds={selectionIds}
         mounts={mounts}
         persistence="file"
+        canWrite
         onMount={(id) =>
           setMounts((current) =>
             current.some((mount) => mount.boardId === id)
@@ -47,6 +48,7 @@ describe("AssistantPanel", () => {
         selectionIds={[]}
         mounts={[]}
         persistence="unavailable"
+        canWrite={false}
         onMount={() => undefined}
         onRemove={() => undefined}
         onLock={() => undefined}
