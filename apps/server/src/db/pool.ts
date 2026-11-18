@@ -35,6 +35,7 @@ export type MemoryStore = {
   >;
   jobs: Map<string, Record<string, unknown>>;
   assets: Map<string, Record<string, unknown>>;
+  materials: Map<string, { id: string; fileId: string; text: string }>;
 };
 
 export const memory: MemoryStore = {
@@ -42,6 +43,7 @@ export const memory: MemoryStore = {
   documents: new Map(),
   jobs: new Map(),
   assets: new Map(),
+  materials: new Map(),
 };
 
 export function useMemoryDb(): boolean {

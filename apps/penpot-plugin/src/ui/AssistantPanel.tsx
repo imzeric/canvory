@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { MountRecord } from "@canvory/core";
 
 const panelFont = '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
@@ -10,7 +11,13 @@ export function AssistantPanel(props: {
   onLock: (id: string, locked: boolean) => void;
   persistence: "file" | "unavailable";
   canWrite: boolean;
+  materialIds?: string[];
+  notice?: string;
+  onGenerate?: (demand: string) => void;
+  onCite?: (text: string) => void;
 }) {
+  const [demand, setDemand] = useState("");
+  const [material, setMaterial] = useState("");
   return (
     <section
       data-testid="assistant-panel"
@@ -18,7 +25,26 @@ export function AssistantPanel(props: {
     >
       <p>PPT</p>
       <p>这是可拖动、可关闭的插件浮窗。</p>
-      <p data-testid="model-state">尚未配置模型，不能生成画板。</p>
+      <p data-testid="model-state">{props.notice || "尚未配置模型，不能生成画板。"}</p>
+      <label>
+        需求
+        <textarea aria-label="需求" value={demand} onChange={(event) => setDemand(event.target.value)} />
+      </label>
+      <button type="button" onClick={() => props.onGenerate?.(demand)}>
+        生成
+      </button>
+      <label>
+        资料
+        <textarea aria-label="资料" value={material} onChange={(event) => setMaterial(event.target.value)} />
+      </label>
+      <button type="button" onClick={() => props.onCite?.(material)}>
+        引用资料
+      </button>
+      <ul data-testid="material-list">
+        {(props.materialIds ?? []).map((id) => (
+          <li key={id}>{id}</li>
+        ))}
+      </ul>
       <button type="button" disabled>
         绘制
       </button>

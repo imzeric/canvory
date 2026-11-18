@@ -1,4 +1,5 @@
 import {
+  addMaterial,
   addMount,
   allowWrite,
   parseFileSession,
@@ -61,6 +62,16 @@ export function mountBoard(store: SessionStore, boardId: string, name: string): 
     return { session, selectionIds: store.selectionIds, write: { ok: false, reason: "NOT_A_BOARD" } };
   }
   const next = addMount(session, boardId, name);
+  if (next.revision !== session.revision) save(store, next);
+  return { session: next, selectionIds: store.selectionIds };
+}
+
+export function citeMaterial(store: SessionStore, materialId: string): AssistantResult {
+  const session = loadBoundSession(store);
+  if (!store.fileId || session.fileId !== store.fileId) {
+    return { session, selectionIds: store.selectionIds, write: { ok: false, reason: "NOT_IN_FILE" } };
+  }
+  const next = addMaterial(session, materialId);
   if (next.revision !== session.revision) save(store, next);
   return { session: next, selectionIds: store.selectionIds };
 }

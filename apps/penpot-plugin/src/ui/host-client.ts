@@ -68,6 +68,10 @@ export async function removeAssistantMount(boardId: string, fileId: string, writ
   return requestHost<AssistantSnapshot>({ type: "assistant:unmount", boardId, fileId, writeEpoch }, "assistant");
 }
 
+export async function citeAssistant(materialId: string, fileId: string, writeEpoch: number): Promise<AssistantSnapshot> {
+  return requestHost<AssistantSnapshot>({ type: "assistant:cite", materialId, fileId, writeEpoch }, "assistant");
+}
+
 export async function lockAssistantMount(
   boardId: string,
   fileId: string,

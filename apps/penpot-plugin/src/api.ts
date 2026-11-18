@@ -19,6 +19,34 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
   return res;
 }
 
+export async function createMaterial(body: { fileId: string; text: string }): Promise<{ id: string }> {
+  const res = await apiFetch("/assistant/materials", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json() as Promise<{ id: string }>;
+}
+
+export async function requestGeneration(body: {
+  fileId: string;
+  demand: string;
+  materialIds: string[];
+}): Promise<{ drawn: false; message: string }> {
+  const res = await apiFetch("/assistant/generate", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  if (res.status === 503 || text.includes("MODEL_PROVIDER_UNCONFIGURED")) {
+    return { drawn: false, message: "尚未配置模型，不能生成画板。" };
+  }
+  if (res.status === 501 || text.includes("PROVIDER_ADAPTER_MISSING")) {
+    return { drawn: false, message: "供应商适配尚未接入，没有绘制画板。" };
+  }
+  return { drawn: false, message: "没有绘制画板。" };
+}
+
 export async function saveDocument(body: { title?: string; cdm?: unknown }) {
   const res = await apiFetch("/documents", {
     method: "POST",

@@ -1,4 +1,5 @@
 import {
+  citeMaterial,
   loadBoundSession,
   lockMountedBoard,
   mountBoard,
@@ -38,6 +39,7 @@ type UiMessage = {
   locked?: boolean;
   expectedRevision?: number;
   writeEpoch?: number;
+  materialId?: string;
 };
 
 export interface AssistantRuntime {
@@ -131,6 +133,29 @@ export function createAssistantRuntime(api: AssistantHostApi, send: (message: un
       if (message?.source !== "canvory-ui" || !message.requestId) return;
       if (message.type === "assistant:load") {
         reply(message.requestId, view().payload);
+        return;
+      }
+      if (message.type === "assistant:cite" && message.materialId) {
+        const current = view();
+        if (!acceptingWrites || message.writeEpoch !== writeEpoch) {
+          reply(message.requestId, {
+            session: current.payload.session,
+            selectionIds,
+            persistence: current.payload.persistence,
+            write: { ok: false, reason: !acceptingWrites ? "SESSION_CLOSED" : "STALE_SESSION" },
+          });
+          return;
+        }
+        const result =
+          !current.store.fileId || message.fileId !== current.store.fileId
+            ? { session: current.payload.session, selectionIds, write: { ok: false, reason: "NOT_IN_FILE" } }
+            : persisted(current.store, citeMaterial(current.store, message.materialId));
+        reply(message.requestId, {
+          session: result.session,
+          selectionIds,
+          persistence: current.payload.persistence,
+          write: result.write,
+        });
         return;
       }
       if (
