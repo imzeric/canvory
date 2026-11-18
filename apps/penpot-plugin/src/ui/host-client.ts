@@ -33,6 +33,50 @@ function requestHost<T>(message: Record<string, unknown>, expect: string): Promi
   });
 }
 
+export interface AssistantSnapshot {
+  session: {
+    fileId: string;
+    pageId: string;
+    revision: number;
+    mounts: { boardId: string; name: string; locked: boolean }[];
+    materialIds: string[];
+  };
+  selectionIds: string[];
+  persistence: "file" | "unavailable";
+}
+
+export async function loadAssistant(): Promise<AssistantSnapshot> {
+  if (!inPluginFrame()) {
+    return {
+      session: { fileId: "", pageId: "", revision: 0, mounts: [], materialIds: [] },
+      selectionIds: [],
+      persistence: "unavailable",
+    };
+  }
+  return requestHost<AssistantSnapshot>({ type: "assistant:load" }, "assistant");
+}
+
+export async function mountAssistant(boardId: string, fileId: string): Promise<AssistantSnapshot> {
+  return requestHost<AssistantSnapshot>({ type: "assistant:mount", boardId, fileId }, "assistant");
+}
+
+export async function removeAssistantMount(boardId: string, fileId: string): Promise<AssistantSnapshot> {
+  return requestHost<AssistantSnapshot>({ type: "assistant:unmount", boardId, fileId }, "assistant");
+}
+
+export async function lockAssistantMount(boardId: string, fileId: string, locked: boolean): Promise<AssistantSnapshot> {
+  return requestHost<AssistantSnapshot>({ type: "assistant:lock", boardId, fileId, locked }, "assistant");
+}
+
+export function listenAssistant(onChange: (snapshot: AssistantSnapshot) => void): () => void {
+  const onMessage = (ev: MessageEvent) => {
+    const data = ev.data as { source?: string; type?: string; payload?: AssistantSnapshot };
+    if (data?.source === SOURCE_HOST && data.type === "assistant" && data.payload) onChange(data.payload);
+  };
+  window.addEventListener("message", onMessage);
+  return () => window.removeEventListener("message", onMessage);
+}
+
 export async function loadHostBoards(): Promise<HostExtractResult> {
   if (isPenpotHost() || !inPluginFrame()) return readHostBoards();
   try {

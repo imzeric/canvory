@@ -8,6 +8,17 @@
 
 **Tech Stack:** TypeScript、Vitest、Zod、React 18。
 
+## 实测进度
+
+只记录 M1。M2–M5 没有实现。
+
+2026-11-18，分支 `song/m1-penpot-session-7484`，基线 `6f55197ffbd5d335b902378db12028880a8842ab`：
+
+- `pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build` 均退出码 0。
+- 有断言的测试 38 个：document-model 4、core 9、exporter-pptx 3、server 9、penpot-plugin 13。
+- Penpot 2.4.3 官方浮窗里，PPT 模式显示「尚未配置模型，不能生成画板。」，「绘制」为禁用。选中画板「文本」后挂载；关闭并重新打开后挂载名仍在，当前选区为空。
+- 明细：`docs/test/2-test-report/m1-session.md`。
+
 ## Global Constraints
 
 - 不修改 Penpot 仓库。浮窗是 `plugin-modal`。
