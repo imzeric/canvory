@@ -15,7 +15,7 @@ import {
   removeAssistantMount,
   type AssistantSnapshot,
 } from "./host-client.js";
-import { apiFetch, createMaterial, requestGeneration, saveDocument } from "../api.js";
+import { apiFetch, createMaterial, materialRetentionMessage, requestGeneration, saveDocument } from "../api.js";
 
 export function App() {
   const [tab, setTab] = useState<"export" | "preflight" | "assistant">("assistant");
@@ -135,6 +135,7 @@ export function App() {
             const writeEpoch = assistant?.writeEpoch;
             if (!fileId || !text || assistant?.acceptingWrites !== true || writeEpoch === undefined) return;
             void createMaterial({ fileId, text }).then((saved) => {
+              setGenerationNotice(materialRetentionMessage(saved.persistent));
               enqueueSession(() => citeAssistant(saved.id, fileId, writeEpoch));
             });
           }}

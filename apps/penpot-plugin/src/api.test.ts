@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { requestGeneration } from "./api.js";
+import { materialRetentionMessage, requestGeneration } from "./api.js";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -15,5 +15,10 @@ describe("requestGeneration", () => {
     expect(result.drawn).toBe(false);
     expect(result.message).toContain("没有绘制画板");
     expect(result.ops).toHaveLength(1);
+  });
+
+  it("does not describe process memory as durable storage", () => {
+    expect(materialRetentionMessage(false)).toContain("重启后会丢失");
+    expect(materialRetentionMessage(true)).toContain("数据库");
   });
 });

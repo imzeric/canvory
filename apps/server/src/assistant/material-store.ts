@@ -31,7 +31,7 @@ export async function saveMaterial(input: {
   text: string;
   mime: string;
   storeBytes: boolean;
-}): Promise<{ id: string; storage: "postgres" | "memory" }> {
+}): Promise<{ id: string; storage: "postgres" | "memory"; persistent: boolean }> {
   assertMaterialInput(input.fileId, input.text, input.mime);
   const id = randomUUID();
   let storageKey: string | null = null;
@@ -46,7 +46,7 @@ export async function saveMaterial(input: {
        VALUES ($1,$2,$3,$4,$5,$6)`,
       [id, input.ownerId, input.fileId, input.mime, input.text, storageKey],
     );
-    return { id, storage: "postgres" };
+    return { id, storage: "postgres", persistent: true };
   }
   memory.materials.set(id, {
     id,
@@ -55,7 +55,7 @@ export async function saveMaterial(input: {
     text: input.text,
     mime: input.mime,
   });
-  return { id, storage: "memory" };
+  return { id, storage: "memory", persistent: false };
 }
 
 export async function readMaterial(ownerId: string, fileId: string, id: string): Promise<MaterialRow | null> {

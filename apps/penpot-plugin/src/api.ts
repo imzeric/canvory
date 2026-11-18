@@ -19,13 +19,20 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
   return res;
 }
 
-export async function createMaterial(body: { fileId: string; text: string }): Promise<{ id: string }> {
+export function materialRetentionMessage(persistent: boolean): string {
+  return persistent
+    ? "资料已写入数据库，服务重启后仍可按引用读回。"
+    : "资料只在当前服务进程里，重启后会丢失。";
+}
+
+export async function createMaterial(body: { fileId: string; text: string }): Promise<{ id: string; persistent: boolean }> {
   const res = await apiFetch("/assistant/materials", {
     method: "POST",
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(await res.text());
-  return res.json() as Promise<{ id: string }>;
+  const payload = (await res.json()) as { id: string; persistent?: boolean };
+  return { id: payload.id, persistent: payload.persistent === true };
 }
 
 export async function requestGeneration(body: {

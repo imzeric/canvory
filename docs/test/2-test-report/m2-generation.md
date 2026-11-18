@@ -27,7 +27,9 @@
 
 注册的 provider 类型只有 `openai-compatible`。它按 OpenAI Chat Completions 文档发 `POST {CANVORY_MODEL_BASE_URL}/chat/completions`，请求体只有 `model` 和 `messages`（`system` 与 `user`），头是 `Authorization: Bearer` 和 `Content-Type: application/json`。不加载任意模块，也不使用 MockModelProvider。
 
-本地 HTTP fixture 覆盖了：成功返回并经 schema 校验、429、超时 504、调用方取消 408、连接失败 502、带 `code` 的操作和 `canvory.mounts` 被拒绝。响应 `drawn` 为 false，且不含密钥。长文本先分块再放进 `user`，字符不丢，系统提示不含这些字符。用户文本里的地址不会被服务端另外抓取。
+本地 HTTP fixture 覆盖了：按上下文预算分成多次 `chat/completions`、按请求顺序合并、后一块失败则不再请求下一块、429、超时 504、调用方取消 408、连接失败 502、带 `code` 的操作和 `canvory.mounts` 被拒绝。每一次请求的 `user` 不超过该次预算。响应 `drawn` 为 false，且不含密钥。没有用真实密钥打到外部模型。用户文本里的地址不会被服务端另外抓取。
+
+进程内存模式的引用会提示「重启后会丢失」，不写成已经长期保存。数据库模式才提示重启后仍可按引用读回。
 
 无 `CANVORY_MODEL_PROVIDER` 或 `CANVORY_MODEL_API_KEY` 时返回 503。未注册的类型返回 400 `PROVIDER_UNKNOWN`，不再返回 501。
 

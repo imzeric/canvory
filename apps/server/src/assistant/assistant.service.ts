@@ -67,25 +67,31 @@ export class AssistantService {
         return { id, text: part.text };
       }),
     );
+    const chunks = [...demandChunks, ...materialChunks];
+    const active = (signal ?? new AbortController().signal) as AbortSignal;
+    const provider = createOpenAICompatible({
+      baseUrl: config.baseUrl,
+      apiKey: config.apiKey,
+      model: config.model,
+      timeoutMs: config.timeoutMs,
+    });
+    const ops: HostOp[] = [];
     try {
-      const content = await createOpenAICompatible({
-        baseUrl: config.baseUrl,
-        apiKey: config.apiKey,
-        model: config.model,
-        timeoutMs: config.timeoutMs,
-      }).complete({
-        chunks: [...demandChunks, ...materialChunks],
-        signal: (signal ?? new AbortController().signal) as AbortSignal,
-      });
-      let parsed: unknown;
-      try {
-        parsed = JSON.parse(content) as unknown;
-      } catch {
-        throw new ModelCallError("HOST_OP_REJECTED", 422);
+      for (const chunk of chunks) {
+        if (active.aborted) throw new ModelCallError("MODEL_CANCELLED", 408);
+        if (chunk.text.length > config.chunkChars) throw new ModelCallError("HOST_OP_REJECTED", 422);
+        const content = await provider.complete({ chunks: [chunk], signal: active });
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(content) as unknown;
+        } catch {
+          throw new ModelCallError("HOST_OP_REJECTED", 422);
+        }
+        ops.push(...parseHostOps(parsed));
       }
       return {
         drawn: false,
-        ops: parseHostOps(parsed),
+        ops,
         sourceRefs,
         providerId: config.id,
       };
