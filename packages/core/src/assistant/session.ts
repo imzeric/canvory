@@ -38,6 +38,11 @@ export function sessionForFile(stored: FileSession | null, fileId: string, pageI
   return { ...stored, pageId };
 }
 
+export function addMaterial(session: FileSession, materialId: string): FileSession {
+  if (session.materialIds.includes(materialId)) return session;
+  return { ...session, revision: session.revision + 1, materialIds: [...session.materialIds, materialId] };
+}
+
 export function addMount(session: FileSession, boardId: string, name: string): FileSession {
   if (session.mounts.some((mount) => mount.boardId === boardId)) return session;
   return {

@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "@canvory/document-model": "workspace:*",
-    "@canvory/shared": "workspace:*"
+    "@canvory/shared": "workspace:*",
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

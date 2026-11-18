@@ -6,6 +6,7 @@ import { ExportPanel } from "./ExportPanel.js";
 import { PreflightPanel } from "./PreflightPanel.js";
 import type { HostExtractResult } from "../penpot-host.js";
 import {
+  citeAssistant,
   listenAssistant,
   loadAssistant,
   loadHostBoards,
@@ -14,7 +15,7 @@ import {
   removeAssistantMount,
   type AssistantSnapshot,
 } from "./host-client.js";
-import { apiFetch, saveDocument } from "../api.js";
+import { apiFetch, createMaterial, materialRetentionMessage, requestGeneration, saveDocument } from "../api.js";
 
 export function App() {
   const [tab, setTab] = useState<"export" | "preflight" | "assistant">("assistant");
@@ -22,6 +23,7 @@ export function App() {
   const [host, setHost] = useState<HostExtractResult | null>(null);
   const [documentId, setDocumentId] = useState<string | undefined>();
   const [saveHint, setSaveHint] = useState("");
+  const [generationNotice, setGenerationNotice] = useState("");
   const sessionQueue = useRef(Promise.resolve());
 
   const enqueueSession = useCallback((run: () => Promise<AssistantSnapshot>) => {
@@ -112,6 +114,31 @@ export function App() {
           mounts={assistant?.session.mounts ?? []}
           persistence={assistant?.persistence ?? "unavailable"}
           canWrite={assistant?.acceptingWrites === true}
+          materialIds={assistant?.session.materialIds ?? []}
+          notice={generationNotice}
+          onGenerate={(demand) => {
+            const fileId = assistant?.session.fileId;
+            if (!fileId) {
+              setGenerationNotice("当前不在 Penpot 文件中，不能生成。");
+              return;
+            }
+            void requestGeneration({
+              fileId,
+              demand,
+              materialIds: assistant?.session.materialIds ?? [],
+            })
+              .then((result) => setGenerationNotice(result.message))
+              .catch(() => setGenerationNotice("没有绘制画板。"));
+          }}
+          onCite={(text) => {
+            const fileId = assistant?.session.fileId;
+            const writeEpoch = assistant?.writeEpoch;
+            if (!fileId || !text || assistant?.acceptingWrites !== true || writeEpoch === undefined) return;
+            void createMaterial({ fileId, text }).then((saved) => {
+              setGenerationNotice(materialRetentionMessage(saved.persistent));
+              enqueueSession(() => citeAssistant(saved.id, fileId, writeEpoch));
+            });
+          }}
           onMount={(id) => {
             const fileId = assistant?.session.fileId;
             const writeEpoch = assistant?.writeEpoch;

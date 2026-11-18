@@ -119,4 +119,31 @@ describe("assistant runtime", () => {
     expect(host.created).toEqual([]);
     expect(host.box.saved).toBe(saved);
   });
+
+  it("stores a material citation and drops it after finish", () => {
+    const host = fakePenpot();
+    const sent: unknown[] = [];
+    const runtime = createAssistantRuntime(host.api, (message) => sent.push(message));
+    runtime.handle({
+      source: "canvory-ui",
+      type: "assistant:cite",
+      requestId: "c1",
+      materialId: "mat-1",
+      fileId: "file-a",
+      writeEpoch: 1,
+    });
+    expect(host.box.saved).toContain("mat-1");
+    const saved = host.box.saved;
+    runtime.emit("finish");
+    runtime.handle({
+      source: "canvory-ui",
+      type: "assistant:cite",
+      requestId: "c2",
+      materialId: "mat-2",
+      fileId: "file-a",
+      writeEpoch: 1,
+    });
+    expect(payloadOf(sent, "c2")?.write?.reason).toBe("SESSION_CLOSED");
+    expect(host.box.saved).toBe(saved);
+  });
 });

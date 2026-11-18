@@ -8,6 +8,8 @@ import { PreflightController } from "./export/preflight.controller.js";
 import { TasksController } from "./export/tasks.controller.js";
 import { TasksService } from "./export/tasks.service.js";
 import { AuthGuard } from "./auth/auth.guard.js";
+import { AssistantController } from "./assistant/assistant.controller.js";
+import { AssistantService } from "./assistant/assistant.service.js";
 
 @Module({
   controllers: [
@@ -16,8 +18,9 @@ import { AuthGuard } from "./auth/auth.guard.js";
     AssetsController,
     PreflightController,
     TasksController,
+    AssistantController,
   ],
-  providers: [DocumentsService, VersionsService, TasksService, AuthGuard],
+  providers: [DocumentsService, VersionsService, TasksService, AuthGuard, AssistantService],
 })
 export class AppModule {}
 

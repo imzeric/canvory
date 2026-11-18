@@ -61,4 +61,27 @@ describe("AssistantPanel", () => {
     expect(screen.getByTestId("model-state").textContent).toContain("尚未配置模型");
     expect(panel.textContent).toContain("可拖动、可关闭的插件浮窗");
   });
+
+  it("asks the server to generate without claiming a board was drawn", () => {
+    let demand = "";
+    render(
+      <AssistantPanel
+        selectionIds={[]}
+        mounts={[]}
+        persistence="file"
+        canWrite
+        onMount={() => undefined}
+        onRemove={() => undefined}
+        onLock={() => undefined}
+        onGenerate={(value) => {
+          demand = value;
+        }}
+      />,
+    );
+    fireEvent.change(screen.getByRole("textbox", { name: "需求" }), { target: { value: "做一页封面" } });
+    fireEvent.click(screen.getByRole("button", { name: "生成" }));
+    expect(demand).toBe("做一页封面");
+    expect((screen.getByRole("button", { name: "绘制" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByTestId("assistant-panel").textContent).not.toContain("已绘制");
+  });
 });

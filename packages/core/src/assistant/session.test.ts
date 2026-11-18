@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addMount, parseFileSession, removeMount, sessionForFile, setMountLocked } from "./session.js";
+import { addMaterial, addMount, parseFileSession, removeMount, sessionForFile, setMountLocked } from "./session.js";
 
 describe("sessionForFile", () => {
   it("does not carry mounts into another file", () => {
@@ -45,5 +45,18 @@ describe("sessionForFile", () => {
     const removed = removeMount(locked, "b2");
     expect(removed.mounts.map((mount) => mount.boardId)).toEqual(["b1"]);
     expect(removed.revision).toBe(5);
+  });
+
+  it("adds a material id without copying it to another file", () => {
+    const stored = parseFileSession({
+      fileId: "file-a",
+      pageId: "page-a",
+      revision: 1,
+      mounts: [],
+      materialIds: [],
+    });
+    const next = addMaterial(stored, "mat-1");
+    expect(next.materialIds).toEqual(["mat-1"]);
+    expect(sessionForFile(next, "file-b", "page-b").materialIds).toEqual([]);
   });
 });

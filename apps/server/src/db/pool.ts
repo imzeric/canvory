@@ -35,6 +35,7 @@ export type MemoryStore = {
   >;
   jobs: Map<string, Record<string, unknown>>;
   assets: Map<string, Record<string, unknown>>;
+  materials: Map<string, { id: string; ownerId: string; fileId: string; text: string; mime: string }>;
 };
 
 export const memory: MemoryStore = {
@@ -42,8 +43,15 @@ export const memory: MemoryStore = {
   documents: new Map(),
   jobs: new Map(),
   assets: new Map(),
+  materials: new Map(),
 };
 
 export function useMemoryDb(): boolean {
   return process.env.USE_MEMORY_DB === "1" || !process.env.DATABASE_URL;
+}
+
+export async function closePool(): Promise<void> {
+  if (!pool) return;
+  await pool.end();
+  pool = null;
 }

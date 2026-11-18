@@ -8,6 +8,12 @@
 
 **Tech Stack:** TypeScript、Vitest、现有 NestJS。
 
+## 实测进度
+
+只记录 M2。M3–M5 没有实现。
+
+2026-11-18，分支 `song/m2-generation-7484`，基线是 M1 head `81d26a8bcd30174d292eb86218067ccedfdc2433`。`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build` 退出码 0。有断言的测试 66 个：document-model 4、core 23、exporter-pptx 3、server 18、penpot-plugin 18。明细：`docs/test/2-test-report/m2-generation.md`。无密钥返回 503。已配置的 `openai-compatible` 会请求 Chat Completions，不再返回 501。资料正文在 Postgres，并可把字节写入 MinIO；另起进程读回。没有绘制。
+
 ## Global Constraints
 
 - 输入框不设字数硬顶。`chunkText` 按空行切，单块超过 `maxChars` 再按句号切。
