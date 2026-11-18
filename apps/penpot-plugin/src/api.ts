@@ -53,7 +53,11 @@ export async function requestGeneration(body: {
   }
   const payload = JSON.parse(text) as { ops?: unknown[] };
   const ops = Array.isArray(payload.ops) ? payload.ops : [];
-  return { drawn: false, ops, message: `已校验 ${ops.length} 条操作，没有绘制画板。` };
+  return {
+    drawn: false,
+    ops,
+    message: `传输结果，不是外部模型验收。已校验 ${ops.length} 条操作，尚未绘制。`,
+  };
 }
 
 export async function saveDocument(body: { title?: string; cdm?: unknown }) {

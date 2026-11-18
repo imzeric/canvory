@@ -7,7 +7,9 @@ import { PreflightPanel } from "./PreflightPanel.js";
 import type { HostExtractResult } from "../penpot-host.js";
 import {
   citeAssistant,
+  applyValidatedOps,
   listenAssistant,
+  readBoardRevisions,
   runFixture,
   loadAssistant,
   loadHostBoards,
@@ -25,6 +27,8 @@ export function App() {
   const [documentId, setDocumentId] = useState<string | undefined>();
   const [saveHint, setSaveHint] = useState("");
   const [generationNotice, setGenerationNotice] = useState("");
+  const [pendingOps, setPendingOps] = useState<unknown[]>([]);
+  const [pendingRevisions, setPendingRevisions] = useState<Record<string, number>>({});
   const sessionQueue = useRef(Promise.resolve());
 
   const enqueueSession = useCallback((run: () => Promise<AssistantSnapshot>) => {
@@ -120,6 +124,16 @@ export function App() {
           canWrite={assistant?.acceptingWrites === true}
           materialIds={assistant?.session.materialIds ?? []}
           notice={generationNotice}
+          canDraw={pendingOps.length > 0 && assistant?.acceptingWrites === true}
+          onDraw={() => {
+            if (!pendingOps.length || assistant?.acceptingWrites !== true) return;
+            const ops = pendingOps;
+            setPendingOps([]);
+            void applyValidatedOps(ops, pendingRevisions).then((snapshot) => {
+              setAssistant(snapshot);
+              setGenerationNotice(snapshot.notice ?? "宿主没有返回绘制结果。");
+            });
+          }}
           onGenerate={(demand) => {
             const fileId = assistant?.session.fileId;
             if (!fileId) {
@@ -131,11 +145,21 @@ export function App() {
               demand,
               materialIds: assistant?.session.materialIds ?? [],
             })
-              .then((result) => setGenerationNotice(result.message))
+              .then(async (result) => {
+                const revisions = await readBoardRevisions().catch(() => ({}));
+                setPendingRevisions(revisions);
+                setPendingOps(result.ops);
+                const revisionText = Object.entries(revisions)
+                  .map(([id, revision]) => `${id.slice(0, 8)}=${revision}`)
+                  .join("，");
+                setGenerationNotice(
+                  `${result.message}${revisionText ? ` 当时挂载修订：${revisionText}。` : ""}`,
+                );
+              })
               .catch(() => setGenerationNotice("没有绘制画板。"));
           }}
           onFixture={(kind) => {
-            void runFixture(kind).then((snapshot) => {
+            void runFixture(kind, kind === "edit" ? pendingRevisions : undefined).then((snapshot) => {
               setAssistant(snapshot);
               if (snapshot.notice) setGenerationNotice(snapshot.notice);
             });

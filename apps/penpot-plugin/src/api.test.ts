@@ -13,7 +13,8 @@ describe("requestGeneration", () => {
     );
     const result = await requestGeneration({ fileId: "file-a", demand: "封面", materialIds: [] });
     expect(result.drawn).toBe(false);
-    expect(result.message).toContain("没有绘制画板");
+    expect(result.message).toContain("尚未绘制");
+    expect(result.message).toContain("不是外部模型验收");
     expect(result.ops).toHaveLength(1);
   });
 

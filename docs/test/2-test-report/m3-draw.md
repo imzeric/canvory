@@ -4,7 +4,7 @@
 
 ## 命令
 
-`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build` 退出码都是 0。有断言的测试 81 个：document-model 4、core 30、exporter-pptx 3、server 19、penpot-plugin 25。
+`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build` 退出码都是 0。有断言的测试 82 个：document-model 4、core 30、exporter-pptx 3、server 19、penpot-plugin 26。
 
 ## 执行器
 
@@ -16,7 +16,13 @@
 
 ## 实机
 
-Penpot 2.4.3 官方浮窗里点击「运行测试夹具」后，图层出现 `IT7484-M3-FIXTURE-1`（含文字和矩形）和 `IT7484-M3-FIXTURE-2`（含文字）。只挂载第一页和原先的「文本」后再点「测试夹具只改已挂载」，这两块出现 `IT7484-M3-EDIT`，未挂载的第二页没有这层。
+本地 HTTP 夹具返回两条操作。插件「生成」显示「传输结果，不是外部模型验收。已校验 2 条操作，尚未绘制。」然后「绘制」才在宿主创建 `IT7484-M3-TRANSPORT` 和它的文字。这不是外部模型。
+
+焦点回到画布后按一次 Ctrl+Z，该画板和文字一起从图层消失。失败画板没有自动回滚；界面写明要用 Penpot 撤销，插件不能自动回滚。
+
+把已挂载画板上文字宽度从 880 改到 140 之后，插件读到的画板修订仍是 1，随后的编辑没有跳过。宿主手改跳过这次没有被证明。单元测试覆盖修订号不一致时跳过。`shapechange` 按官方事件接收形状代理，并另记一份外部修改计数，但这次属性修改没有让计数增加。
+
+图片沿用当前页已有 id 的放置函数已接上。这次实机没有拿现成图片 id 画出新矩形。M4 需要 `uploadMediaData` 这条导入路径，不能永远只引用已有图片。
 
 截图：
 

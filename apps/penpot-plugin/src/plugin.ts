@@ -47,6 +47,8 @@ type UiMessage = {
   pageId?: string;
   locked?: boolean;
   expectedRevision?: number;
+  ops?: unknown;
+  boardRevisions?: Record<string, number>;
   widthPx?: number;
   heightPx?: number;
 };
@@ -57,22 +59,38 @@ if (penpot?.ui?.open && penpot.ui.sendMessage && penpot.ui.onMessage) {
   const send = penpot.ui.sendMessage.bind(penpot.ui);
   const runtime = createAssistantRuntime(penpot, send);
   let writingFixture = false;
+  const externalEdits = new Map<string, number>();
+  const liveBoardRevision = (id: string) => {
+    const stored = readBoardRevision(
+      (penpot.currentPage?.getShapeById?.(id) as { getPluginData?: (key: string) => string | null } | null)?.getPluginData?.(
+        "canvory.board-rev",
+      ),
+    );
+    return stored + (externalEdits.get(id) ?? 0);
+  };
   penpot.on?.("shapechange", (value) => {
-    if (writingFixture || !Array.isArray(value)) return;
-    for (const id of value) {
-      if (typeof id !== "string") continue;
-      const shape = penpot.currentPage?.getShapeById?.(id) as {
+    if (writingFixture || !value || typeof value !== "object" || Array.isArray(value)) return;
+    const shape = value as {
+      id?: string;
+      type?: string;
+      parent?: {
         id?: string;
         type?: string;
-        parent?: { id?: string; type?: string; getPluginData?: (key: string) => string | null; setPluginData?: (key: string, value: string) => void } | null;
+        parent?: unknown;
         getPluginData?: (key: string) => string | null;
         setPluginData?: (key: string, value: string) => void;
       } | null;
-      const board = shape?.type === "board" || shape?.type === "frame" ? shape : shape?.parent;
-      if (!board?.id || !runtime.gate().mounted.includes(board.id) || !board.getPluginData || !board.setPluginData) continue;
-      const next = readBoardRevision(board.getPluginData("canvory.board-rev")) + 1;
-      board.setPluginData("canvory.board-rev", String(next));
+      getPluginData?: (key: string) => string | null;
+      setPluginData?: (key: string, value: string) => void;
+    };
+    let current: typeof shape | null = shape;
+    let board: typeof shape | null = null;
+    for (let depth = 0; current && depth < 8; depth += 1) {
+      if (current.type === "board" || current.type === "frame") board = current;
+      current = (current.parent as typeof shape | null) ?? null;
     }
+    if (!board?.id || !runtime.gate().mounted.includes(board.id)) return;
+    externalEdits.set(board.id, (externalEdits.get(board.id) ?? 0) + 1);
   });
   penpot.ui.open("Canvory PPTX Export", `?theme=${penpot.theme ?? "light"}`, {
     width: 440,
@@ -86,27 +104,11 @@ if (penpot?.ui?.open && penpot.ui.sendMessage && penpot.ui.onMessage) {
   penpot.ui.onMessage((raw) => {
     const message = raw as UiMessage;
     if (message?.source !== SOURCE_UI || !message.requestId) return;
-    if (message.type === "assistant:fixture" || message.type === "assistant:fixture-edit") {
+    if (message.type === "assistant:board-revisions") {
       const gate = runtime.gate();
-      const shape = (id: string) => penpot.currentPage?.getShapeById?.(id) as { getPluginData?: (key: string) => string | null } | null;
-      writingFixture = true;
-      let outcomes;
-      try {
-      outcomes = drawWithPenpot(penpot as never, message.type === "assistant:fixture" ? fixtureCreateOps() : fixtureEditOps(gate.mounted), {
-        expectedFileId: gate.fileId ?? "",
-        expectedPageId: gate.pageId ?? "",
-        expectedEpoch: gate.epoch,
-        fileId: () => penpot.currentFile?.id ?? null,
-        pageId: () => penpot.currentPage?.id ?? null,
-        epoch: () => runtime.gate().epoch,
-        accepting: () => runtime.gate().accepting,
-        mounted: () => runtime.gate().mounted,
-        locked: () => runtime.gate().locked,
-        cancelled: () => false,
-        boardRevision: (id: string) => readBoardRevision(shape(id)?.getPluginData?.("canvory.board-rev")),
-      });
-      } finally {
-        writingFixture = false;
+      const boardRevisions: Record<string, number> = {};
+      for (const boardId of gate.mounted) {
+        boardRevisions[boardId] = liveBoardRevision(boardId);
       }
       send({
         source: SOURCE_HOST,
@@ -118,7 +120,55 @@ if (penpot?.ui?.open && penpot.ui.sendMessage && penpot.ui.onMessage) {
           persistence: gate.fileId ? "file" : "unavailable",
           writeEpoch: gate.epoch,
           acceptingWrites: gate.accepting,
-          notice: `${FIXTURE_LABEL}：${outcomes.map((item) => `${item.name} ${item.status}`).join("，")}`,
+          boardRevisions,
+        },
+      });
+      return;
+    }
+    if (message.type === "assistant:fixture" || message.type === "assistant:fixture-edit" || message.type === "assistant:apply") {
+      const gate = runtime.gate();
+      const ops =
+        message.type === "assistant:apply"
+          ? message.ops
+          : message.type === "assistant:fixture"
+            ? fixtureCreateOps()
+            : fixtureEditOps(gate.mounted);
+      writingFixture = true;
+      let outcomes;
+      try {
+        outcomes = drawWithPenpot(penpot as never, ops as never, {
+          expectedFileId: gate.fileId ?? "",
+          expectedPageId: gate.pageId ?? "",
+          expectedEpoch: gate.epoch,
+          fileId: () => penpot.currentFile?.id ?? null,
+          pageId: () => penpot.currentPage?.id ?? null,
+          epoch: () => runtime.gate().epoch,
+          accepting: () => runtime.gate().accepting,
+          mounted: () => runtime.gate().mounted,
+          locked: () => runtime.gate().locked,
+          cancelled: () => false,
+          boardRevision: (id: string) => liveBoardRevision(id),
+          expectedBoardRevision: message.boardRevisions,
+        });
+      } finally {
+        setTimeout(() => {
+          writingFixture = false;
+        }, 0);
+      }
+      const failed = outcomes.some((item) => item.status === "failed");
+      const prefix = message.type === "assistant:apply" ? "传输结果，不是外部模型验收" : FIXTURE_LABEL;
+      const recovery = failed ? "失败的画板可能仍留在画布上，请用 Penpot 撤销该页。插件不能自动回滚。" : "";
+      send({
+        source: SOURCE_HOST,
+        type: "assistant",
+        requestId: message.requestId,
+        payload: {
+          session: gate.session,
+          selectionIds: [],
+          persistence: gate.fileId ? "file" : "unavailable",
+          writeEpoch: gate.epoch,
+          acceptingWrites: gate.accepting,
+          notice: `${prefix}：${outcomes.map((item) => `${item.name} ${item.status}`).join("，")}。${recovery}`,
         },
       });
       return;

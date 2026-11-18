@@ -29,6 +29,11 @@ export interface DrawApi {
   createEllipse(): DrawShape;
   findShape(id: string): DrawShape | null;
   hasMedia(id: string): boolean;
+  placeExistingMedia?(
+    board: DrawShape,
+    mediaId: string,
+    box: { name?: string; x: number; y: number; width: number; height: number },
+  ): void;
 }
 
 export interface DrawContext {
@@ -43,6 +48,7 @@ export interface DrawContext {
   locked(): string[];
   cancelled(): boolean;
   boardRevision(boardId: string): number;
+  expectedBoardRevision?: Record<string, number>;
 }
 
 export interface BoardOutcome {
@@ -99,8 +105,10 @@ function place(board: DrawShape, shape: DrawShape, box: { x: number; y: number; 
 
 export function executeHostPlan(input: unknown, ctx: DrawContext, api: DrawApi): BoardOutcome[] {
   const ops = assertExecutableOps(input);
-  const expectedRevision: Record<string, number> = {};
-  for (const boardId of ctx.mounted()) expectedRevision[boardId] = ctx.boardRevision(boardId);
+  const expectedRevision: Record<string, number> = { ...(ctx.expectedBoardRevision ?? {}) };
+  for (const boardId of ctx.mounted()) {
+    if (expectedRevision[boardId] === undefined) expectedRevision[boardId] = ctx.boardRevision(boardId);
+  }
   const outcomes: BoardOutcome[] = [];
   for (const group of groupOps(ops)) {
     if (sessionClosed(ctx)) {
@@ -129,7 +137,10 @@ export function executeHostPlan(input: unknown, ctx: DrawContext, api: DrawApi):
         board.name = group.name;
         board.resize(group.width, group.height);
         for (const child of group.children) {
-          if (child.op === "uploadMedia" && !api.hasMedia(child.mediaId)) throw new Error("MEDIA_MISSING");
+          if (child.op === "uploadMedia") {
+            if (!api.hasMedia(child.mediaId) || !api.placeExistingMedia) throw new Error("MEDIA_MISSING");
+            api.placeExistingMedia(board, child.mediaId, child);
+          }
           if (child.op === "createText") place(board, api.createText(child.text), child);
           if (child.op === "createRectangle") place(board, api.createRectangle(), child);
           if (child.op === "createEllipse") place(board, api.createEllipse(), child);
@@ -175,7 +186,10 @@ export function executeHostPlan(input: unknown, ctx: DrawContext, api: DrawApi):
         if (op.op === "createText") place(board, api.createText(op.text), op);
         if (op.op === "createRectangle") place(board, api.createRectangle(), op);
         if (op.op === "createEllipse") place(board, api.createEllipse(), op);
-        if (op.op === "uploadMedia" && !api.hasMedia(op.mediaId)) throw new Error("MEDIA_MISSING");
+        if (op.op === "uploadMedia") {
+          if (!api.hasMedia(op.mediaId) || !api.placeExistingMedia) throw new Error("MEDIA_MISSING");
+          api.placeExistingMedia(board, op.mediaId, op);
+        }
       }
       const next = ctx.boardRevision(group.boardId) + 1;
       board.setPluginData(BOARD_REVISION_KEY, String(next));

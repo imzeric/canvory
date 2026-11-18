@@ -84,4 +84,26 @@ describe("AssistantPanel", () => {
     expect((screen.getByRole("button", { name: "绘制" }) as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByTestId("assistant-panel").textContent).not.toContain("已绘制");
   });
+
+  it("draws only after validated operations exist", () => {
+    let drawn = 0;
+    render(
+      <AssistantPanel
+        selectionIds={[]}
+        mounts={[]}
+        persistence="file"
+        canWrite
+        canDraw
+        onMount={() => undefined}
+        onRemove={() => undefined}
+        onLock={() => undefined}
+        onDraw={() => {
+          drawn += 1;
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "绘制" }));
+    expect(drawn).toBe(1);
+    expect(screen.getByTestId("assistant-panel").textContent).toContain("不是模型生成");
+  });
 });

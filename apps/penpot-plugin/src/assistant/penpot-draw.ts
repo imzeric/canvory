@@ -54,5 +54,15 @@ export function drawWithPenpot(penpot: PenpotApi, ops: HostOp[], ctx: DrawContex
     createEllipse: () => penpot.createEllipse!(),
     findShape: (id) => penpot.currentPage?.getShapeById?.(id) ?? null,
     hasMedia: (id) => Boolean(penpot.currentPage?.getShapeById?.(id)),
+    placeExistingMedia(board, mediaId, box) {
+      const source = penpot.currentPage?.getShapeById?.(mediaId) as { fills?: unknown } | null;
+      const rect = penpot.createRectangle!();
+      rect.name = box.name ?? "已有图片";
+      rect.x = box.x;
+      rect.y = box.y;
+      rect.resize(box.width, box.height);
+      if (source?.fills) (rect as DrawShape & { fills?: unknown }).fills = source.fills;
+      board.appendChild(rect);
+    },
   });
 }

@@ -16,6 +16,8 @@ export function AssistantPanel(props: {
   onGenerate?: (demand: string) => void;
   onCite?: (text: string) => void;
   onFixture?: (kind: "create" | "edit") => void;
+  canDraw?: boolean;
+  onDraw?: () => void;
 }) {
   const [demand, setDemand] = useState("");
   const [material, setMaterial] = useState("");
@@ -46,9 +48,10 @@ export function AssistantPanel(props: {
           <li key={id}>{id}</li>
         ))}
       </ul>
-      <button type="button" disabled>
+      <button type="button" disabled={!props.canDraw} onClick={() => props.onDraw?.()}>
         绘制
       </button>
+      <p>绘制只应用已校验的操作，并由宿主再检查。没有校验结果时不能绘制。</p>
       <button type="button" onClick={() => props.onFixture?.("create")}>
         运行测试夹具
       </button>
