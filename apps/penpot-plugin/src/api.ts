@@ -35,14 +35,18 @@ export async function createMaterial(body: { fileId: string; text: string }): Pr
   return { id: payload.id, persistent: payload.persistent === true };
 }
 
-export async function requestGeneration(body: {
-  fileId: string;
-  demand: string;
-  materialIds: string[];
-}): Promise<{ drawn: false; message: string; ops: unknown[] }> {
+export async function requestGeneration(
+  body: {
+    fileId: string;
+    demand: string;
+    materialIds: string[];
+  },
+  signal?: AbortSignal,
+): Promise<{ drawn: false; message: string; ops: unknown[] }> {
   const res = await apiFetch("/assistant/generate", {
     method: "POST",
     body: JSON.stringify(body),
+    signal,
   });
   const text = await res.text();
   if (res.status === 503 || text.includes("MODEL_PROVIDER_UNCONFIGURED")) {

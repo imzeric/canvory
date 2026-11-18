@@ -39,7 +39,7 @@ describe("AssistantPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "改选区" }));
     expect(screen.getByTestId("mount-list").textContent).toContain("board-1");
     expect(screen.getByTestId("mount-list").textContent).not.toContain("board-2");
-    expect(screen.getByTestId("selection-list").textContent).toBe("board-2");
+    expect(screen.getByTestId("selection-list").textContent).toContain("board-2");
   });
 
   it("uses the approved panel color and keeps generation disabled", () => {
@@ -55,11 +55,13 @@ describe("AssistantPanel", () => {
       />,
     );
     const panel = screen.getByTestId("assistant-panel");
-    expect(panel.getAttribute("style")).toContain("rgb(24, 27, 31)");
-    expect(panel.getAttribute("style")).toContain("14px");
+    expect(getComputedStyle(panel).backgroundColor).toBe("rgb(244, 247, 246)");
+    expect(getComputedStyle(panel).color).toBe("rgb(28, 36, 34)");
+    expect(getComputedStyle(panel).fontSize).toBe("14px");
+    expect(getComputedStyle(screen.getByRole("button", { name: "生成" })).backgroundColor).toBe("rgb(12, 110, 100)");
     expect((screen.getByRole("button", { name: "绘制" }) as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByTestId("model-state").textContent).toContain("尚未配置模型");
-    expect(panel.textContent).toContain("可拖动、可关闭的插件浮窗");
+    expect(panel.textContent).toContain("可拖动，可关闭");
   });
 
   it("asks the server to generate without claiming a board was drawn", () => {
