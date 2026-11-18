@@ -45,6 +45,7 @@ export interface AssistantSnapshot {
   persistence: "file" | "unavailable";
   writeEpoch: number;
   acceptingWrites: boolean;
+  notice?: string;
 }
 
 export async function loadAssistant(): Promise<AssistantSnapshot> {
@@ -66,6 +67,10 @@ export async function mountAssistant(boardId: string, fileId: string, writeEpoch
 
 export async function removeAssistantMount(boardId: string, fileId: string, writeEpoch: number): Promise<AssistantSnapshot> {
   return requestHost<AssistantSnapshot>({ type: "assistant:unmount", boardId, fileId, writeEpoch }, "assistant");
+}
+
+export async function runFixture(kind: "create" | "edit"): Promise<AssistantSnapshot> {
+  return requestHost<AssistantSnapshot>({ type: kind === "create" ? "assistant:fixture" : "assistant:fixture-edit" }, "assistant");
 }
 
 export async function citeAssistant(materialId: string, fileId: string, writeEpoch: number): Promise<AssistantSnapshot> {

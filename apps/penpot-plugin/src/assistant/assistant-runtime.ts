@@ -1,3 +1,4 @@
+import type { FileSession } from "@canvory/core";
 import {
   citeMaterial,
   loadBoundSession,
@@ -45,6 +46,15 @@ type UiMessage = {
 export interface AssistantRuntime {
   handle(raw: unknown): void;
   emit(event: "selectionchange" | "filechange" | "pagechange" | "finish", value?: unknown): void;
+  gate(): {
+    epoch: number;
+    accepting: boolean;
+    fileId: string | null;
+    pageId: string | null;
+    mounted: string[];
+    locked: string[];
+    session: FileSession;
+  };
 }
 
 function findShape(page: AssistantHostApi["currentPage"], id: string): PluginShape | null {
@@ -114,6 +124,18 @@ export function createAssistantRuntime(api: AssistantHostApi, send: (message: un
   };
 
   return {
+    gate() {
+      const current = view();
+      return {
+        epoch: writeEpoch,
+        accepting: acceptingWrites,
+        fileId: current.store.fileId,
+        pageId: current.store.pageId,
+        mounted: current.payload.session.mounts.map((mount) => mount.boardId),
+        locked: current.payload.session.mounts.filter((mount) => mount.locked).map((mount) => mount.boardId),
+        session: current.payload.session,
+      };
+    },
     emit(event, value) {
       if (event === "selectionchange") {
         selectionIds = Array.isArray(value) ? value.filter((id): id is string => typeof id === "string") : readIds(api.selection);

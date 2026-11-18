@@ -15,6 +15,7 @@ export function AssistantPanel(props: {
   notice?: string;
   onGenerate?: (demand: string) => void;
   onCite?: (text: string) => void;
+  onFixture?: (kind: "create" | "edit") => void;
 }) {
   const [demand, setDemand] = useState("");
   const [material, setMaterial] = useState("");
@@ -48,6 +49,13 @@ export function AssistantPanel(props: {
       <button type="button" disabled>
         绘制
       </button>
+      <button type="button" onClick={() => props.onFixture?.("create")}>
+        运行测试夹具
+      </button>
+      <button type="button" onClick={() => props.onFixture?.("edit")}>
+        测试夹具只改已挂载
+      </button>
+      <p>测试夹具不是模型生成。</p>
       <ul data-testid="mount-list">
         {props.mounts.map((mount) => (
           <li key={mount.boardId}>

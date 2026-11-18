@@ -8,6 +8,7 @@ import type { HostExtractResult } from "../penpot-host.js";
 import {
   citeAssistant,
   listenAssistant,
+  runFixture,
   loadAssistant,
   loadHostBoards,
   lockAssistantMount,
@@ -39,7 +40,10 @@ export function App() {
   useEffect(() => {
     void refreshHost();
     void loadAssistant().then(setAssistant);
-    return listenAssistant(setAssistant);
+    return listenAssistant((snapshot) => {
+      setAssistant(snapshot);
+      if (snapshot.notice) setGenerationNotice(snapshot.notice);
+    });
   }, [refreshHost]);
 
   const boards = (host?.boards ?? []).map((b) => ({ id: b.id, name: b.name }));
@@ -129,6 +133,12 @@ export function App() {
             })
               .then((result) => setGenerationNotice(result.message))
               .catch(() => setGenerationNotice("没有绘制画板。"));
+          }}
+          onFixture={(kind) => {
+            void runFixture(kind).then((snapshot) => {
+              setAssistant(snapshot);
+              if (snapshot.notice) setGenerationNotice(snapshot.notice);
+            });
           }}
           onCite={(text) => {
             const fileId = assistant?.session.fileId;
