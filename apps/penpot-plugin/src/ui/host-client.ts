@@ -45,6 +45,8 @@ export interface AssistantSnapshot {
   persistence: "file" | "unavailable";
   writeEpoch: number;
   acceptingWrites: boolean;
+  notice?: string;
+  boardRevisions?: Record<string, number>;
 }
 
 export async function loadAssistant(): Promise<AssistantSnapshot> {
@@ -66,6 +68,25 @@ export async function mountAssistant(boardId: string, fileId: string, writeEpoch
 
 export async function removeAssistantMount(boardId: string, fileId: string, writeEpoch: number): Promise<AssistantSnapshot> {
   return requestHost<AssistantSnapshot>({ type: "assistant:unmount", boardId, fileId, writeEpoch }, "assistant");
+}
+
+export async function readBoardRevisions(): Promise<Record<string, number>> {
+  const snapshot = await requestHost<AssistantSnapshot & { boardRevisions?: Record<string, number> }>(
+    { type: "assistant:board-revisions" },
+    "assistant",
+  );
+  return snapshot.boardRevisions ?? {};
+}
+
+export async function applyValidatedOps(ops: unknown[], boardRevisions: Record<string, number>): Promise<AssistantSnapshot> {
+  return requestHost<AssistantSnapshot>({ type: "assistant:apply", ops, boardRevisions }, "assistant");
+}
+
+export async function runFixture(kind: "create" | "edit", boardRevisions?: Record<string, number>): Promise<AssistantSnapshot> {
+  return requestHost<AssistantSnapshot>(
+    { type: kind === "create" ? "assistant:fixture" : "assistant:fixture-edit", boardRevisions },
+    "assistant",
+  );
 }
 
 export async function citeAssistant(materialId: string, fileId: string, writeEpoch: number): Promise<AssistantSnapshot> {

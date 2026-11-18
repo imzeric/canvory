@@ -35,14 +35,18 @@ export async function createMaterial(body: { fileId: string; text: string }): Pr
   return { id: payload.id, persistent: payload.persistent === true };
 }
 
-export async function requestGeneration(body: {
-  fileId: string;
-  demand: string;
-  materialIds: string[];
-}): Promise<{ drawn: false; message: string; ops: unknown[] }> {
+export async function requestGeneration(
+  body: {
+    fileId: string;
+    demand: string;
+    materialIds: string[];
+  },
+  signal?: AbortSignal,
+): Promise<{ drawn: false; message: string; ops: unknown[] }> {
   const res = await apiFetch("/assistant/generate", {
     method: "POST",
     body: JSON.stringify(body),
+    signal,
   });
   const text = await res.text();
   if (res.status === 503 || text.includes("MODEL_PROVIDER_UNCONFIGURED")) {
@@ -53,7 +57,11 @@ export async function requestGeneration(body: {
   }
   const payload = JSON.parse(text) as { ops?: unknown[] };
   const ops = Array.isArray(payload.ops) ? payload.ops : [];
-  return { drawn: false, ops, message: `已校验 ${ops.length} 条操作，没有绘制画板。` };
+  return {
+    drawn: false,
+    ops,
+    message: `传输结果，不是外部模型验收。已校验 ${ops.length} 条操作，尚未绘制。`,
+  };
 }
 
 export async function saveDocument(body: { title?: string; cdm?: unknown }) {
