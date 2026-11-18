@@ -1,47 +1,48 @@
 # M2 生成协议实测
 
-日期：2026-11-18。只覆盖生成子计划。没有调用真实模型，没有绘制画板。模板、图表和三种导出没有实现。
+日期：2026-11-18。没有调用外部付费模型，没有把操作画到 Penpot。模板、图表和三种导出没有实现。
 
 ## 命令
 
-在仓库根目录连续执行，全部退出码 0：
+在仓库根目录、且未导出 `DATABASE_URL` 时连续执行，全部退出码 0：
 
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm test`
 - `pnpm build`
 
-`pnpm test` 里有断言的用例 59 个：
+`pnpm test` 里有断言的用例 66 个：
 
 | 包 | 通过 |
 | --- | ---: |
 | `@canvory/document-model` | 4 |
-| `@canvory/core` | 22 |
+| `@canvory/core` | 23 |
 | `@canvory/exporter-pptx` | 3 |
-| `@canvory/server` | 13 |
-| `@canvory/penpot-plugin` | 17 |
+| `@canvory/server` | 18 |
+| `@canvory/penpot-plugin` | 18 |
 
-没有测试文件的包以 `--passWithNoTests` 退出码 0，不计入 59。
+没有测试文件的包以 `--passWithNoTests` 退出码 0，不计入 66。
 
-## 不需要密钥就能做的事
+## 协议
 
-- 长文本按空行再按句号分块，超长片段继续按字数切开，不丢字。
-- 资料正文按文件 id 存在服务端进程内存。另一个文件 id 读不到。
-- 浮窗可以提交需求和引用资料。引用 id 写入当前文件会话。`finish` 之后不能再写。
-- 系统提示固定为「你只返回 JSON 操作数组。」用户文本只在 `user` 字段。
-- 白名单操作：`createBoard`、`createText`、`createRectangle`、`createEllipse`、`setPluginData`、`uploadMedia`、`replaceText`。未知操作或 `code` 字段整段拒绝。
-- `generateWithProvider` 的返回值 `drawn` 固定为 false。
-- `POST /api/v1/assistant/generate` 在 `CANVORY_MODEL_PROVIDER` 或 `CANVORY_MODEL_API_KEY` 为空时返回 503，文案 `MODEL_PROVIDER_UNCONFIGURED`。
-- 两个变量都有值时返回 501 `PROVIDER_ADAPTER_MISSING`，响应里没有 `MOCK:`，也没有 `createBoard`。
-- `apps/server/src/main.ts` 和 `provider-factory.ts` 不引用 `MockModelProvider`。
-- 用 `node dist/main.js` 在本机 3010 端口调用 `POST /api/v1/assistant/generate`，响应 503，正文含 `MODEL_PROVIDER_UNCONFIGURED` 和 `drawn: false`。这次没有拿到新的浮窗截图。
+注册的 provider 类型只有 `openai-compatible`。它按 OpenAI Chat Completions 文档发 `POST {CANVORY_MODEL_BASE_URL}/chat/completions`，请求体只有 `model` 和 `messages`（`system` 与 `user`），头是 `Authorization: Bearer` 和 `Content-Type: application/json`。不加载任意模块，也不使用 MockModelProvider。
 
-## 外部依赖
+本地 HTTP fixture 覆盖了：成功返回并经 schema 校验、429、超时 504、调用方取消 408、连接失败 502、带 `code` 的操作和 `canvory.mounts` 被拒绝。响应 `drawn` 为 false，且不含密钥。长文本先分块再放进 `user`，字符不丢，系统提示不含这些字符。用户文本里的地址不会被服务端另外抓取。
 
-真实供应商调用还没有适配器。配置了名字和密钥也不会出网，也不会画板。密钥不写入日志和响应。资料正文在进程内存里，重启后要重新引用。
+无 `CANVORY_MODEL_PROVIDER` 或 `CANVORY_MODEL_API_KEY` 时返回 503。未注册的类型返回 400 `PROVIDER_UNKNOWN`，不再返回 501。
+
+## 资料
+
+支持粘贴 `text/plain`。不支持 PDF、图片、任意 URL 和本机路径。`fileId` 不能含 `/` 或 `..`。读写同时核对认证用户和 file id。
+
+`assistant_materials` 在 Postgres。另起一个 Node 进程能读回同一条正文，别的 owner 读不到。配置了 MinIO 时，同一正文的字节写入对象存储，新进程按 `storage_key` 取回，长度 55 字节。未配置数据库时仍可用进程内存，那种模式重启后不会保留，不记成恢复通过。
+
+## 插件
+
+「生成」把服务端返回的操作留在结果里，但 `drawn` 固定为 false，文案含「没有绘制画板」。「绘制」仍禁用。这不是外部模型验收。
 
 ## 还没有做
 
-- 没有把操作应用到 Penpot 图层。逐画板手改修订仍属于绘制里程碑。
-- 没有模板、原生图表、HTML 或 PDF。
+- 没有把操作画到图层。逐画板手改修订属于绘制里程碑。
+- 没有用真实密钥打到外部供应商。
 - 没有合并。

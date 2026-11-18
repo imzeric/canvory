@@ -32,19 +32,21 @@ export async function requestGeneration(body: {
   fileId: string;
   demand: string;
   materialIds: string[];
-}): Promise<{ drawn: false; message: string }> {
+}): Promise<{ drawn: false; message: string; ops: unknown[] }> {
   const res = await apiFetch("/assistant/generate", {
     method: "POST",
     body: JSON.stringify(body),
   });
   const text = await res.text();
   if (res.status === 503 || text.includes("MODEL_PROVIDER_UNCONFIGURED")) {
-    return { drawn: false, message: "尚未配置模型，不能生成画板。" };
+    return { drawn: false, ops: [], message: "尚未配置模型，不能生成画板。" };
   }
-  if (res.status === 501 || text.includes("PROVIDER_ADAPTER_MISSING")) {
-    return { drawn: false, message: "供应商适配尚未接入，没有绘制画板。" };
+  if (!res.ok) {
+    return { drawn: false, ops: [], message: "没有绘制画板。" };
   }
-  return { drawn: false, message: "没有绘制画板。" };
+  const payload = JSON.parse(text) as { ops?: unknown[] };
+  const ops = Array.isArray(payload.ops) ? payload.ops : [];
+  return { drawn: false, ops, message: `已校验 ${ops.length} 条操作，没有绘制画板。` };
 }
 
 export async function saveDocument(body: { title?: string; cdm?: unknown }) {

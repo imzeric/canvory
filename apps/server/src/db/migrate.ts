@@ -13,10 +13,13 @@ async function main() {
   }
   const client = new pg.Client({ connectionString: url });
   await client.connect();
-  const sql = fs.readFileSync(path.join(__dirname, "migrations/001_init.sql"), "utf8");
-  await client.query(sql);
+  const dir = path.join(__dirname, "migrations");
+  const files = fs.readdirSync(dir).filter((name) => name.endsWith(".sql")).sort();
+  for (const name of files) {
+    await client.query(fs.readFileSync(path.join(dir, name), "utf8"));
+  }
   await client.end();
-  console.log("Migration 001_init applied");
+  console.log(`Migrations applied: ${files.join(", ")}`);
 }
 
 main().catch((e) => {

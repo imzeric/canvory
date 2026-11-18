@@ -12,6 +12,18 @@ describe("parseHostOps", () => {
     expect(() => parseHostOps([{ op: "eval", code: "1" }])).toThrow("HOST_OP_REJECTED");
   });
 
+  it("rejects plugin data that would overwrite the session or a remote target", () => {
+    expect(() =>
+      parseHostOps([{ op: "setPluginData", target: "file", id: "file-a", key: "canvory.mounts", value: "{}" }]),
+    ).toThrow("HOST_OP_REJECTED");
+    expect(() =>
+      parseHostOps([{ op: "setPluginData", target: "file", id: "file-a", key: "canvory.auth", value: "root" }]),
+    ).toThrow("HOST_OP_REJECTED");
+    expect(() =>
+      parseHostOps([{ op: "uploadMedia", boardId: "b", mediaId: "https://evil.example/a.png", x: 0, y: 0, width: 1, height: 1 }]),
+    ).toThrow("HOST_OP_REJECTED");
+  });
+
   it("accepts a createBoard operation", () => {
     expect(parseHostOps([{ op: "createBoard", name: "封面", width: 1920, height: 1080 }])).toEqual([
       { op: "createBoard", name: "封面", width: 1920, height: 1080 },

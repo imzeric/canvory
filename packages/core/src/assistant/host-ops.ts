@@ -51,10 +51,28 @@ const setPluginData = z
 const uploadMedia = z.object({ op: z.literal("uploadMedia"), boardId: z.string(), mediaId: z.string(), ...box }).strict();
 const replaceText = z.object({ op: z.literal("replaceText"), nodeId: z.string(), text: z.string() }).strict();
 
+export function isReservedPluginKey(key: string): boolean {
+  const normalized = key.trim().toLowerCase();
+  return (
+    normalized.startsWith("canvory.") ||
+    normalized === "canvory" ||
+    normalized.startsWith("__") ||
+    normalized.includes("..")
+  );
+}
+
 export function parseHostOps(input: unknown): HostOp[] {
   const parsed = z
     .array(z.union([createBoard, createText, createRectangle, createEllipse, setPluginData, uploadMedia, replaceText]))
     .safeParse(input);
   if (!parsed.success) throw new Error("HOST_OP_REJECTED");
+  for (const op of parsed.data) {
+    if (op.op === "setPluginData" && (isReservedPluginKey(op.key) || op.key.length > 64)) {
+      throw new Error("HOST_OP_REJECTED");
+    }
+    if (op.op === "uploadMedia" && (op.mediaId.includes("://") || op.mediaId.includes(".."))) {
+      throw new Error("HOST_OP_REJECTED");
+    }
+  }
   return parsed.data;
 }
