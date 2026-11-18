@@ -119,4 +119,16 @@ export interface CanvoryDocument {
     updatedAt: number;
     version: number;
   };
+  outline?: Array<{
+    id: string;
+    title: string;
+    body: string;
+    status: "pending" | "drawing" | "drawn" | "failed" | "stopped" | "skipped_user_edit";
+  }>;
+  charts?: Array<{
+    id: string;
+    kind: "column" | "bar" | "line" | "pie" | "scatter";
+    categories: string[];
+    series: Array<{ name: string; values: number[] }>;
+  }>;
 }

@@ -5,3 +5,6 @@ export * from "./degrade.js";
 export * from "./preflight.js";
 export * from "./font-map.js";
 export * from "./rasterize.js";
+export * from "./assistant/write-gate.js";
+export * from "./assistant/session.js";
+export type { FileSession, MountRecord, WriteGateSnapshot, WriteIntent } from "./assistant/types.js";

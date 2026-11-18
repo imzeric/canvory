@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CanvoryError } from "@canvory/shared";
-import { SUPPORTED_CDM_SCHEMA_VERSION } from "@canvory/shared";
+import { SUPPORTED_CDM_SCHEMA_VERSIONS } from "@canvory/shared";
 import type { CanvoryDocument } from "./types.js";
 
 const transformSchema = z.object({
@@ -144,6 +144,28 @@ export const canvoryDocumentSchema = z.object({
     updatedAt: z.number(),
     version: z.number(),
   }),
+  outline: z
+    .array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        body: z.string(),
+        status: z.enum(["pending", "drawing", "drawn", "failed", "stopped", "skipped_user_edit"]),
+      }),
+    )
+    .optional()
+    .default([]),
+  charts: z
+    .array(
+      z.object({
+        id: z.string(),
+        kind: z.enum(["column", "bar", "line", "pie", "scatter"]),
+        categories: z.array(z.string()),
+        series: z.array(z.object({ name: z.string(), values: z.array(z.number()) })),
+      }),
+    )
+    .optional()
+    .default([]),
 });
 
 export function parseCanvoryDocument(input: unknown): CanvoryDocument {
@@ -155,10 +177,10 @@ export function parseCanvoryDocument(input: unknown): CanvoryDocument {
       400,
     );
   }
-  if (parsed.data.schemaVersion !== SUPPORTED_CDM_SCHEMA_VERSION) {
+  if (!SUPPORTED_CDM_SCHEMA_VERSIONS.includes(parsed.data.schemaVersion as "1.0.0" | "1.1.0")) {
     throw new CanvoryError(
       "SCHEMA_UNSUPPORTED",
-      `SCHEMA_UNSUPPORTED：不支持的 schemaVersion，期望 ${SUPPORTED_CDM_SCHEMA_VERSION}，实际 ${parsed.data.schemaVersion}`,
+      `SCHEMA_UNSUPPORTED：不支持的 schemaVersion，期望 ${SUPPORTED_CDM_SCHEMA_VERSIONS.join(" 或 ")}，实际 ${parsed.data.schemaVersion}`,
       400,
     );
   }
