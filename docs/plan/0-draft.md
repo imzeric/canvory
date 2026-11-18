@@ -128,3 +128,7 @@ CDM → 可交付演示文稿文件。
 - 冲刺门禁 → `2-ready-to-go.md`。  
 - 可执行任务 → `docs/shipping/0-to-dos.md`（唯一任务清单）。  
 - 正式需求基线 → `specs/001-pptx-phase1/spec.md`。
+
+## 9. 待审设计（未实施）
+
+当前方案是 Penpot 官方插件浮窗里的 AI 助手，规格在 `docs/superpowers/specs/2026-11-18-penpot-ai-ppt-design.md`（用户已批准）。不改 Penpot 宿主。产品事实在 `PRODUCT.md`，浮窗视觉种子在 `DESIGN.md`。实施计划索引在 `docs/superpowers/plans/2026-11-18-penpot-ai-ppt-plan.md`，计划本身待审，没有执行。独立网页向导和宿主侧栏都不是现行方案。
